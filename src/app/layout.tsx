@@ -2,8 +2,6 @@ import '@/app/globals.css';
 
 import { GeistSans } from 'geist/font/sans';
 
-import { InquiryButton } from '@/features/inquiry/ui/InquiryButton';
-
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
   : 'http://localhost:3000';
@@ -25,7 +23,6 @@ export default function RootLayout({
         {/* Mobile app shell — centered, phone-width */}
         <div className="mx-auto flex min-h-dvh w-full min-w-[380px] max-w-[540px] flex-col">
           {children}
-          <InquiryButton />
         </div>
       </body>
     </html>

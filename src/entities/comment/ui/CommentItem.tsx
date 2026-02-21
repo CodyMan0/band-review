@@ -19,7 +19,7 @@ export function CommentItem({ comment, onSeek, onReply }: CommentItemProps) {
   const [repliesOpen, setRepliesOpen] = useState(false);
 
   return (
-    <div className="flex flex-col gap-3 border-b border-border/60 last:border-b-0">
+    <div className="flex flex-col gap-3 border-b border-border/60 py-2 last:border-b-0">
       {/* Main comment */}
       <div className="flex items-start gap-3">
         {/* Part dot accent */}

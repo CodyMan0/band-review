@@ -66,7 +66,7 @@ export function SessionDetailClient({
     <ProfileProvider>
       <div className="flex flex-1 flex-col pb-20">
         {/* Back button */}
-        <div className="px-4 py-3">
+        <div className="px-2 py-3">
           <Link
             href="/"
             className="inline-flex items-center gap-1 text-sm text-muted-foreground active:opacity-60"

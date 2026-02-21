@@ -16,7 +16,22 @@ export function TimelineMarkers({
   currentTime,
   onSeek,
 }: TimelineMarkersProps) {
-  if (duration <= 0 || comments.length === 0) return null;
+  // Skeleton placeholder while duration loads — prevents layout shift
+  if (duration <= 0) {
+    return (
+      <div className="flex flex-col gap-1.5 px-5 py-3">
+        <div className="relative h-8 w-full">
+          <div className="absolute left-0 top-1/2 h-1 w-full -translate-y-1/2 rounded-full bg-muted animate-pulse" />
+        </div>
+        <div className="flex items-center justify-between text-[10px] text-muted-foreground/60">
+          <span>0:00</span>
+          <span>--:--</span>
+        </div>
+      </div>
+    );
+  }
+
+  if (comments.length === 0) return null;
 
   const progressPct = Math.min((currentTime / duration) * 100, 100);
 

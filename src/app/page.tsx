@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { getDashboardStats } from '@/entities/session/action/get-dashboard-stats';
 import { getSessions } from '@/entities/session/action/get-sessions';
 import { SessionCard } from '@/entities/session/ui/SessionCard';
+import { SettingsMenu } from '@/features/inquiry/ui/SettingsMenu';
 import { Button } from '@/shared/ui';
 
 export default async function HomePage() {
@@ -15,8 +16,13 @@ export default async function HomePage() {
     <div className="flex flex-1 flex-col pb-24 pt-8">
       {/* Dashboard section */}
       <div className="px-5">
-        <p className="text-xs font-medium text-muted-foreground">🎵 Harmony Band</p>
-        <h1 className="mt-1 text-[22px] font-bold tracking-tight">대시보드</h1>
+        <div className="flex items-start justify-between">
+          <div>
+            <p className="text-xs font-medium text-muted-foreground">🎵 Harmony Band</p>
+            <h1 className="mt-1 text-[22px] font-bold tracking-tight">대시보드</h1>
+          </div>
+          <SettingsMenu />
+        </div>
 
         {/* Stats cards */}
         <div className="mt-4 flex flex-wrap gap-2">
