@@ -115,6 +115,16 @@
   }
 }
 
+@keyframes flashHighlight {
+  0% { background-color: hsl(var(--primary) / 0.2); }
+  50% { background-color: hsl(var(--primary) / 0.1); }
+  100% { background-color: transparent; }
+}
+
+.flash-highlight {
+  animation: flashHighlight 1.2s ease-out;
+}
+
 /* ── Utility: hide scrollbar but keep scroll functionality ── */
 .no-scrollbar::-webkit-scrollbar {
   display: none;

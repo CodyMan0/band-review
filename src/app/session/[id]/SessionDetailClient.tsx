@@ -36,10 +36,34 @@ export function SessionDetailClient({
   const [replyTo, setReplyTo] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<"feedback" | "praise">("feedback");
   const [isPraiseMode, setIsPraiseMode] = useState(false);
+  const [highlightedId, setHighlightedId] = useState<string | null>(null);
 
   const handleSeek = useCallback((seconds: number) => {
     playerRef.current?.seekTo(seconds);
   }, []);
+
+  const handleMarkerClick = useCallback(
+    (id: string, type: "comment" | "praise") => {
+      // Switch tab if needed
+      if (type === "comment" && activeTab !== "feedback") {
+        setActiveTab("feedback");
+        setFilterPart("all");
+      } else if (type === "praise" && activeTab !== "praise") {
+        setActiveTab("praise");
+      }
+
+      // Set highlight, then scroll after tab switch renders
+      setHighlightedId(id);
+      setTimeout(() => {
+        const el = document.getElementById(`item-${id}`);
+        el?.scrollIntoView({ behavior: "smooth", block: "center" });
+      }, 100);
+
+      // Clear highlight after animation
+      setTimeout(() => setHighlightedId(null), 1500);
+    },
+    [activeTab],
+  );
 
   const handleTimeUpdate = useCallback((time: number) => {
     setCurrentTime(time);
@@ -95,9 +119,11 @@ export function SessionDetailClient({
         {/* Timeline markers */}
         <TimelineMarkers
           comments={initialComments}
+          praises={initialPraises}
           duration={duration}
           currentTime={currentTime}
           onSeek={handleSeek}
+          onMarkerClick={handleMarkerClick}
         />
 
         {/* Session info */}
@@ -179,9 +205,10 @@ export function SessionDetailClient({
               filterPart={filterPart}
               onSeek={handleSeek}
               onReply={handleReply}
+              highlightedId={highlightedId}
             />
           ) : (
-            <PraiseList praises={initialPraises} onSeek={handleSeek} />
+            <PraiseList praises={initialPraises} onSeek={handleSeek} highlightedId={highlightedId} />
           )}
         </div>
       </div>

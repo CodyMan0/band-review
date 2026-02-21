@@ -6,6 +6,7 @@ export interface Praise {
   timestamp_sec: number;
   author_name: string;
   author_part: Part;
+  target_part: Part;
   content: string;
   created_at: string;
 }

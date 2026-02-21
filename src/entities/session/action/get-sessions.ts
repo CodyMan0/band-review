@@ -16,14 +16,21 @@ export async function getSessions(): Promise<SessionWithCommentCount[]> {
 
   const sessionsWithCounts: SessionWithCommentCount[] = await Promise.all(
     sessions.map(async (session) => {
-      const { count } = await supabase
-        .from('comments')
-        .select('*', { count: 'exact', head: true })
-        .eq('session_id', session.id);
+      const [{ count: commentCount }, { count: praiseCount }] = await Promise.all([
+        supabase
+          .from('comments')
+          .select('*', { count: 'exact', head: true })
+          .eq('session_id', session.id),
+        supabase
+          .from('praises')
+          .select('*', { count: 'exact', head: true })
+          .eq('session_id', session.id),
+      ]);
 
       return {
         ...session,
-        comment_count: count ?? 0,
+        comment_count: commentCount ?? 0,
+        praise_count: praiseCount ?? 0,
       };
     }),
   );

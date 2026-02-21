@@ -21,11 +21,16 @@ export function SessionCard({ session }: SessionCardProps) {
           <p className="mt-0.5 text-xs text-muted-foreground">{dateStr}</p>
         </div>
 
-        {/* Right: comment count + chevron */}
-        <div className="flex shrink-0 items-center gap-2">
+        {/* Right: counts + chevron */}
+        <div className="flex shrink-0 items-center gap-1.5">
           {session.comment_count > 0 && (
             <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-medium text-primary">
-              {session.comment_count}
+              피드백 {session.comment_count}
+            </span>
+          )}
+          {session.praise_count > 0 && (
+            <span className="rounded-full bg-amber-50 px-2 py-0.5 text-[11px] font-medium text-amber-600">
+              칭찬 {session.praise_count}
             </span>
           )}
           <svg width="14" height="14" viewBox="0 0 14 14" fill="none" className="text-muted-foreground/40">

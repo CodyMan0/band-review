@@ -9,4 +9,5 @@ export interface Session {
 
 export interface SessionWithCommentCount extends Session {
   comment_count: number;
+  praise_count: number;
 }

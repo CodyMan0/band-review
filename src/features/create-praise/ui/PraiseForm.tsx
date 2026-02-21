@@ -1,11 +1,12 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
+import { useState } from "react";
 
-import { createPraise } from '@/features/create-praise/action/create-praise';
-import { getProfile } from '@/shared/config/profile';
-import { formatTimestamp } from '@/shared/lib/format-time';
-import { Input } from '@/shared/ui';
+import { createPraise } from "@/features/create-praise/action/create-praise";
+import { getProfile } from "@/shared/config/profile";
+import { type Part, PARTS } from "@/shared/config/parts";
+import { formatTimestamp } from "@/shared/lib/format-time";
+import { Input } from "@/shared/ui";
 
 interface PraiseFormProps {
   sessionId: string;
@@ -14,26 +15,34 @@ interface PraiseFormProps {
   onCancel: () => void;
 }
 
-export function PraiseForm({ sessionId, currentTime, onSubmitted, onCancel }: PraiseFormProps) {
-  const [content, setContent] = useState('');
+export function PraiseForm({
+  sessionId,
+  currentTime,
+  onSubmitted,
+  onCancel,
+}: PraiseFormProps) {
+  const [targetPart, setTargetPart] = useState<Part | null>(null);
+  const [content, setContent] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    const text = content.trim() || '👏';
+    if (!targetPart) return;
+    const text = content.trim() || "👏";
 
     const profile = getProfile();
     if (!profile) return;
 
     setIsSubmitting(true);
-    setError('');
+    setError("");
 
     const result = await createPraise({
       session_id: sessionId,
       timestamp_sec: currentTime,
       author_name: profile.name,
       author_part: profile.part,
+      target_part: targetPart,
       content: text,
     });
 
@@ -44,12 +53,13 @@ export function PraiseForm({ sessionId, currentTime, onSubmitted, onCancel }: Pr
       return;
     }
 
-    setContent('');
+    setContent("");
+    setTargetPart(null);
     onSubmitted?.();
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === 'Enter' && !e.shiftKey) {
+    if (e.key === "Enter" && !e.shiftKey && targetPart) {
       e.preventDefault();
       handleSubmit(e as unknown as React.FormEvent);
     }
@@ -57,6 +67,28 @@ export function PraiseForm({ sessionId, currentTime, onSubmitted, onCancel }: Pr
 
   return (
     <form onSubmit={handleSubmit} className="flex flex-col gap-2">
+      {/* Part selector */}
+      <div className="flex items-center gap-1.5 overflow-x-auto no-scrollbar">
+        <span className="shrink-0 text-xs font-medium text-amber-600">
+          누구에게?
+        </span>
+        {PARTS.map((p) => (
+          <button
+            key={p.value}
+            type="button"
+            onClick={() => setTargetPart(p.value)}
+            className={`shrink-0 rounded-full px-2.5 py-1 text-xs font-medium transition-all active:scale-95 ${
+              targetPart === p.value
+                ? `${p.color} border ring-1 ring-amber-300`
+                : "bg-muted text-muted-foreground"
+            }`}
+          >
+            {p.emoji} {p.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Input row */}
       <div className="flex items-center gap-2">
         <span className="shrink-0 inline-flex items-center gap-1 rounded-full bg-amber-50 border border-amber-200 px-2.5 py-1 text-xs font-semibold text-amber-600 select-none">
           👏 {formatTimestamp(currentTime)}
@@ -74,14 +106,23 @@ export function PraiseForm({ sessionId, currentTime, onSubmitted, onCancel }: Pr
 
         <button
           type="submit"
-          disabled={isSubmitting}
+          disabled={isSubmitting || !targetPart}
           className="shrink-0 inline-flex items-center justify-center w-9 h-9 rounded-full bg-amber-500 text-white hover:bg-amber-600 active:scale-95 disabled:opacity-40 disabled:pointer-events-none transition-all duration-150"
           aria-label="칭찬 보내기"
         >
           {isSubmitting ? (
-            <svg width="14" height="14" viewBox="0 0 14 14" fill="currentColor" className="animate-spin opacity-80">
-              <path d="M7 1a6 6 0 1 0 0 12A6 6 0 0 0 7 1zm0 1.5a4.5 4.5 0 1 1 0 9 4.5 4.5 0 0 1 0-9z" opacity="0.3"/>
-              <path d="M13 7a6 6 0 0 0-6-6V2.5A4.5 4.5 0 0 1 11.5 7H13z"/>
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 14 14"
+              fill="currentColor"
+              className="animate-spin opacity-80"
+            >
+              <path
+                d="M7 1a6 6 0 1 0 0 12A6 6 0 0 0 7 1zm0 1.5a4.5 4.5 0 1 1 0 9 4.5 4.5 0 0 1 0-9z"
+                opacity="0.3"
+              />
+              <path d="M13 7a6 6 0 0 0-6-6V2.5A4.5 4.5 0 0 1 11.5 7H13z" />
             </svg>
           ) : (
             <span className="text-sm">👏</span>
@@ -94,7 +135,15 @@ export function PraiseForm({ sessionId, currentTime, onSubmitted, onCancel }: Pr
           className="shrink-0 inline-flex items-center justify-center w-9 h-9 rounded-full border border-border/70 text-muted-foreground hover:bg-muted active:scale-95 transition-all duration-150"
           aria-label="취소"
         >
-          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round">
+          <svg
+            width="12"
+            height="12"
+            viewBox="0 0 12 12"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.8"
+            strokeLinecap="round"
+          >
             <line x1="1" y1="1" x2="11" y2="11" />
             <line x1="11" y1="1" x2="1" y2="11" />
           </svg>

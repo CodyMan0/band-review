@@ -9,11 +9,12 @@ interface CreatePraiseInput {
   timestamp_sec: number;
   author_name: string;
   author_part: string;
+  target_part: string;
   content: string;
 }
 
 export async function createPraise(input: CreatePraiseInput): Promise<{ error?: string }> {
-  const { session_id, timestamp_sec, author_name, author_part, content } = input;
+  const { session_id, timestamp_sec, author_name, author_part, target_part, content } = input;
 
   if (!content.trim()) {
     return { error: '내용을 입력해주세요.' };
@@ -26,6 +27,7 @@ export async function createPraise(input: CreatePraiseInput): Promise<{ error?: 
     timestamp_sec,
     author_name,
     author_part,
+    target_part,
     content: content.trim(),
   });
 

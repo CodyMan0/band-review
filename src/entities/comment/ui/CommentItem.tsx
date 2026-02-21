@@ -12,14 +12,18 @@ interface CommentItemProps {
   comment: CommentWithReplies;
   onSeek: (seconds: number) => void;
   onReply: (commentId: string) => void;
+  isHighlighted?: boolean;
 }
 
-export function CommentItem({ comment, onSeek, onReply }: CommentItemProps) {
+export function CommentItem({ comment, onSeek, onReply, isHighlighted }: CommentItemProps) {
   const partConfig = getPartConfig(comment.author_part);
   const [repliesOpen, setRepliesOpen] = useState(false);
 
   return (
-    <div className="flex flex-col gap-3 border-b border-border/60 py-2 last:border-b-0">
+    <div
+      id={`item-${comment.id}`}
+      className={`flex flex-col gap-3 border-b border-border/60 py-2 last:border-b-0 rounded-lg ${isHighlighted ? "flash-highlight" : ""}`}
+    >
       {/* Main comment */}
       <div className="flex items-start gap-3">
         {/* Part dot accent */}

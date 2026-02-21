@@ -10,6 +10,7 @@ interface CommentListProps {
   filterPart: Part | "all";
   onSeek: (seconds: number) => void;
   onReply: (commentId: string) => void;
+  highlightedId?: string | null;
 }
 
 export function CommentList({
@@ -17,6 +18,7 @@ export function CommentList({
   filterPart,
   onSeek,
   onReply,
+  highlightedId,
 }: CommentListProps) {
   const filtered =
     filterPart === "all"
@@ -59,6 +61,7 @@ export function CommentList({
           comment={comment}
           onSeek={onSeek}
           onReply={onReply}
+          isHighlighted={highlightedId === comment.id}
         />
       ))}
     </div>
