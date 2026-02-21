@@ -4,91 +4,78 @@
 
 @layer base {
   :root {
-    /* Warm off-white backgrounds — feels like parchment, not a hospital */
-    --background: 36 25% 97%;
-    --foreground: 222 20% 16%;
+    /* Clean white — 깨끗하고 밝은 배경 */
+    --background: 0 0% 100%;
+    --foreground: 222 20% 12%;
 
-    --card: 36 20% 99%;
-    --card-foreground: 222 20% 16%;
+    --card: 0 0% 100%;
+    --card-foreground: 222 20% 12%;
 
-    --popover: 36 20% 99%;
-    --popover-foreground: 222 20% 16%;
+    --popover: 0 0% 100%;
+    --popover-foreground: 222 20% 12%;
 
-    /* Warm indigo — spiritual depth without corporate coldness */
-    --primary: 232 48% 48%;
+    /* Primary — od-blue-400 기반 (#3955b4) */
+    --primary: 226 52% 46%;
     --primary-foreground: 0 0% 100%;
 
-    /* Soft amber secondary — warmth, community */
-    --secondary: 38 72% 92%;
-    --secondary-foreground: 222 20% 16%;
+    /* Secondary — od-blue-100 기반 (#f4f6ff) */
+    --secondary: 226 100% 98%;
+    --secondary-foreground: 226 52% 46%;
 
-    /* Warm muted tones */
-    --muted: 36 18% 93%;
-    --muted-foreground: 222 12% 48%;
+    /* Muted — od-light-100 기반 (#f5f5f5) */
+    --muted: 0 0% 96%;
+    --muted-foreground: 220 9% 46%;
 
-    /* Gentle accent */
-    --accent: 232 30% 94%;
-    --accent-foreground: 232 48% 40%;
+    /* Accent — od-blue-200 기반 (#d5e0fa) */
+    --accent: 222 85% 91%;
+    --accent-foreground: 226 52% 38%;
 
-    --destructive: 4 72% 55%;
+    --destructive: 4 72% 53%;
     --destructive-foreground: 0 0% 100%;
 
-    /* Subtle warm borders */
-    --border: 36 16% 88%;
-    --input: 36 16% 88%;
-    --ring: 232 48% 48%;
+    /* Clean borders */
+    --border: 0 0% 90%;
+    --input: 0 0% 90%;
+    --ring: 226 52% 46%;
 
     /* Button states */
-    --btn-background: 36 16% 91%;
-    --btn-background-hover: 232 48% 48%;
-
-    /* Chart colors — warm and friendly */
-    --chart-1: 232 48% 55%;
-    --chart-2: 165 42% 47%;
-    --chart-3: 38 72% 58%;
-    --chart-4: 280 38% 58%;
-    --chart-5: 14 68% 58%;
+    --btn-background: 0 0% 96%;
+    --btn-background-hover: 226 52% 46%;
 
     --radius: 0.625rem;
   }
 
   .dark {
-    --background: 222 22% 10%;
-    --foreground: 36 18% 93%;
+    --background: 222 22% 8%;
+    --foreground: 0 0% 95%;
 
-    --card: 222 22% 13%;
-    --card-foreground: 36 18% 93%;
+    --card: 222 22% 11%;
+    --card-foreground: 0 0% 95%;
 
-    --popover: 222 22% 13%;
-    --popover-foreground: 36 18% 93%;
+    --popover: 222 22% 11%;
+    --popover-foreground: 0 0% 95%;
 
-    --primary: 232 55% 62%;
-    --primary-foreground: 222 22% 10%;
+    --primary: 226 55% 58%;
+    --primary-foreground: 222 22% 8%;
 
-    --secondary: 222 18% 18%;
-    --secondary-foreground: 36 18% 88%;
+    --secondary: 222 18% 16%;
+    --secondary-foreground: 0 0% 90%;
 
-    --muted: 222 18% 18%;
-    --muted-foreground: 222 12% 58%;
+    --muted: 222 18% 16%;
+    --muted-foreground: 220 9% 55%;
 
-    --accent: 232 30% 20%;
-    --accent-foreground: 232 55% 72%;
+    --accent: 226 30% 20%;
+    --accent-foreground: 226 55% 68%;
 
     --destructive: 4 62% 48%;
     --destructive-foreground: 0 0% 100%;
 
-    --border: 222 18% 20%;
-    --input: 222 18% 20%;
-    --ring: 232 55% 62%;
+    --border: 222 18% 18%;
+    --input: 222 18% 18%;
+    --ring: 226 55% 58%;
 
-    --btn-background: 222 18% 18%;
-    --btn-background-hover: 232 55% 62%;
-
-    --chart-1: 232 55% 65%;
-    --chart-2: 165 48% 52%;
-    --chart-3: 38 68% 62%;
-    --chart-4: 280 45% 62%;
-    --chart-5: 14 65% 62%;
+    --btn-background: 222 18% 16%;
+    --btn-background-hover: 226 55% 58%;
   }
 }
 
