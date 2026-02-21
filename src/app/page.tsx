@@ -22,6 +22,7 @@ export default async function HomePage() {
         <div className="mt-4 flex flex-wrap gap-2">
           <StatCard label="총 예배" value={stats.totalSessions} unit="회" />
           <StatCard label="총 리뷰" value={stats.totalComments} unit="개" />
+          <StatCard label="총 칭찬" value={stats.totalPraises} unit="개" />
         </div>
       </div>
 

@@ -1,7 +1,7 @@
-'use client';
+"use client";
 
-import { type CommentWithReplies } from '@/entities/comment/model/comment.interface';
-import { getPartConfig } from '@/shared/config/parts';
+import { type CommentWithReplies } from "@/entities/comment/model/comment.interface";
+import { getPartConfig } from "@/shared/config/parts";
 
 interface TimelineMarkersProps {
   comments: CommentWithReplies[];
@@ -10,7 +10,12 @@ interface TimelineMarkersProps {
   onSeek: (seconds: number) => void;
 }
 
-export function TimelineMarkers({ comments, duration, currentTime, onSeek }: TimelineMarkersProps) {
+export function TimelineMarkers({
+  comments,
+  duration,
+  currentTime,
+  onSeek,
+}: TimelineMarkersProps) {
   if (duration <= 0 || comments.length === 0) return null;
 
   const progressPct = Math.min((currentTime / duration) * 100, 100);
@@ -38,17 +43,17 @@ export function TimelineMarkers({ comments, duration, currentTime, onSeek }: Tim
             <button
               key={comment.id}
               onClick={() => onSeek(comment.timestamp_sec)}
-              className="group absolute top-1/2 -translate-x-1/2 -translate-y-1/2 active:scale-110"
+              className="group absolute top-1/2 -translate-x-1/2 active:scale-110"
               style={{ left: `${pct}%` }}
               title={`${formatSec(comment.timestamp_sec)} - ${comment.author_name}: ${comment.content.slice(0, 30)}`}
             >
-              {/* Dot */}
+              {/* Dot — vertically centered on track */}
               <div
-                className={`h-3 w-3 rounded-full border-2 border-background shadow-sm transition-transform group-hover:scale-125 ${partConfig.dot}`}
+                className={`h-3 w-3 -translate-y-1/2 rounded-full border-2 border-background shadow-sm transition-transform group-hover:scale-125 ${partConfig.dot}`}
               />
-              {/* Stack indicator for multiple replies */}
+              {/* Cluster badge — floats above the dot */}
               {replyCount > 0 && (
-                <span className="absolute -right-1 -top-1 flex h-3.5 w-3.5 items-center justify-center rounded-full bg-foreground text-[8px] font-bold text-background">
+                <span className="absolute bottom-full left-1/2 mb-0.5 flex h-4 min-w-4 -translate-x-1/2 items-center justify-center rounded-full bg-foreground px-1 text-[9px] font-bold text-background">
                   {replyCount + 1}
                 </span>
               )}
@@ -66,7 +71,6 @@ export function TimelineMarkers({ comments, duration, currentTime, onSeek }: Tim
       {/* Legend */}
       <div className="flex items-center justify-between text-[10px] text-muted-foreground/60">
         <span>0:00</span>
-        <span>{comments.length}개 피드백</span>
         <span>{formatSec(duration)}</span>
       </div>
     </div>
@@ -76,5 +80,5 @@ export function TimelineMarkers({ comments, duration, currentTime, onSeek }: Tim
 function formatSec(seconds: number): string {
   const mins = Math.floor(seconds / 60);
   const secs = seconds % 60;
-  return `${mins}:${secs.toString().padStart(2, '0')}`;
+  return `${mins}:${secs.toString().padStart(2, "0")}`;
 }
