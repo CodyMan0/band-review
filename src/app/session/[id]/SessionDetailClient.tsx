@@ -109,13 +109,15 @@ export function SessionDetailClient({
           </Link>
         </div>
 
-        {/* Video — edge to edge within container */}
-        <VideoPlayer
-          ref={playerRef}
-          videoUrl={session.video_url}
-          videoType={session.video_type}
-          onTimeUpdate={handleTimeUpdate}
-        />
+        {/* Video — edge to edge, no border */}
+        <div className="-mx-[1px]">
+          <VideoPlayer
+            ref={playerRef}
+            videoUrl={session.video_url}
+            videoType={session.video_type}
+            onTimeUpdate={handleTimeUpdate}
+          />
+        </div>
 
         {/* Timeline markers */}
         <TimelineMarkers

@@ -13,8 +13,8 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
     setProfile(getProfile());
   }, []);
 
-  // Hydrating — render nothing to avoid flash
-  if (profile === undefined) return null;
+  // Hydrating — render children so their own loading states show immediately
+  if (profile === undefined) return <>{children}</>;
 
   // No profile yet — show setup flow
   if (profile === null) {

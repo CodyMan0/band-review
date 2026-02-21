@@ -58,6 +58,7 @@ export function CreateSessionForm() {
 
       <input type="hidden" name="video_type" value="youtube" />
       <input type="hidden" name="church_id" value={profile?.churchId ?? ''} />
+      <input type="hidden" name="created_by" value={profile?.name ?? ''} />
 
       {/* Error */}
       {state.error && (

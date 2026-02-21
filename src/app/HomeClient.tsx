@@ -7,6 +7,7 @@ import { getDashboardStats, type DashboardStats } from '@/entities/session/actio
 import { getSessions } from '@/entities/session/action/get-sessions';
 import { SessionCard } from '@/entities/session/ui/SessionCard';
 import { type SessionWithCommentCount } from '@/entities/session/model/session.interface';
+import { deleteSession } from '@/features/delete-session/action/delete-session';
 import { SettingsMenu } from '@/features/inquiry/ui/SettingsMenu';
 import { getProfile } from '@/shared/config/profile';
 import { Button } from '@/shared/ui';
@@ -16,6 +17,15 @@ export function HomeClient() {
   const [sessions, setSessions] = useState<SessionWithCommentCount[]>([]);
   const [stats, setStats] = useState<DashboardStats>({ totalSessions: 0, totalComments: 0, totalPraises: 0 });
   const [isLoading, setIsLoading] = useState(true);
+
+  const handleDeleteSession = async (sessionId: string) => {
+    const result = await deleteSession(sessionId);
+    if (result.error) {
+      alert(result.error);
+      return;
+    }
+    setSessions((prev) => prev.filter((s) => s.id !== sessionId));
+  };
 
   useEffect(() => {
     const profile = getProfile();
@@ -91,7 +101,7 @@ export function HomeClient() {
         ) : (
           <div className="flex flex-col gap-2">
             {sessions.map((session) => (
-              <SessionCard key={session.id} session={session} />
+              <SessionCard key={session.id} session={session} onDelete={handleDeleteSession} />
             ))}
           </div>
         )}

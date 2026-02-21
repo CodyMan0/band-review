@@ -16,6 +16,7 @@ export function SettingsMenu() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState("");
+  const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
   const handleOpenMenu = () => setView("menu");
 
@@ -28,7 +29,15 @@ export function SettingsMenu() {
     setView("inquiry");
   };
 
-  const handleClose = () => setView("closed");
+  const handleClose = () => {
+    setView("closed");
+    setShowLogoutConfirm(false);
+  };
+
+  const handleLogout = () => {
+    localStorage.removeItem('harmony-band-profile');
+    window.location.reload();
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -87,7 +96,7 @@ export function SettingsMenu() {
             <div className="mx-auto mb-4 h-1 w-10 rounded-full bg-border" />
 
             {/* Menu view */}
-            {view === "menu" && (
+            {view === "menu" && !showLogoutConfirm && (
               <div className="flex flex-col gap-1">
                 <h2 className="mb-2 text-lg font-bold">설정</h2>
                 <button
@@ -113,6 +122,32 @@ export function SettingsMenu() {
                     <p className="text-xs text-muted-foreground">
                       건의사항이나 궁금한 점을 남겨주세요
                     </p>
+                  </div>
+                </button>
+                <div className="my-1 h-px bg-border" />
+                <button
+                  onClick={() => setShowLogoutConfirm(true)}
+                  className="flex items-center gap-3 rounded-xl px-3 py-3 text-left transition-colors hover:bg-muted active:bg-muted/70"
+                >
+                  <span className="flex h-9 w-9 items-center justify-center rounded-full bg-destructive/10 text-destructive">
+                    <svg
+                      width="18"
+                      height="18"
+                      viewBox="0 0 18 18"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <path d="M6.75 15.75H3.75C3.35 15.75 3 15.4 3 15V3C3 2.6 3.35 2.25 3.75 2.25H6.75" />
+                      <path d="M12 12.75L15.75 9L12 5.25" />
+                      <path d="M15.75 9H6.75" />
+                    </svg>
+                  </span>
+                  <div>
+                    <p className="text-sm font-medium text-destructive">로그아웃</p>
+                    <p className="text-xs text-muted-foreground">프로필 정보가 초기화돼요</p>
                   </div>
                 </button>
               </div>
@@ -202,6 +237,39 @@ export function SettingsMenu() {
                 >
                   닫기
                 </Button>
+              </div>
+            )}
+
+            {/* Logout confirm dialog */}
+            {showLogoutConfirm && (
+              <div className="flex flex-col items-center py-6">
+                <div className="flex h-14 w-14 items-center justify-center rounded-full bg-destructive/10">
+                  <svg width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="hsl(var(--destructive))" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                    <path d="M10.5 24.5H5.83C5.18 24.5 4.67 23.99 4.67 23.33V4.67C4.67 4.01 5.18 3.5 5.83 3.5H10.5" />
+                    <path d="M18.67 19.83L24.5 14L18.67 8.17" />
+                    <path d="M24.5 14H10.5" />
+                  </svg>
+                </div>
+                <p className="mt-3 text-base font-semibold">정말 로그아웃하시겠어요?</p>
+                <p className="mt-1 text-sm text-muted-foreground">프로필 정보가 삭제되고 처음 화면으로 돌아가요</p>
+                <div className="mt-5 flex gap-2">
+                  <Button
+                    onClick={() => setShowLogoutConfirm(false)}
+                    variant="outline"
+                    className="rounded-full px-6"
+                    size="sm"
+                  >
+                    취소
+                  </Button>
+                  <Button
+                    onClick={handleLogout}
+                    variant="destructive"
+                    className="rounded-full px-6"
+                    size="sm"
+                  >
+                    로그아웃
+                  </Button>
+                </div>
               </div>
             )}
           </div>

@@ -167,14 +167,14 @@ export const VideoPlayer = forwardRef<VideoPlayerRef, VideoPlayerProps>(
 
     if (videoType === 'youtube') {
       return (
-        <div className="aspect-video w-full overflow-hidden rounded-lg bg-black">
+        <div className="aspect-video w-full bg-black">
           <div id="yt-player" className="h-full w-full" />
         </div>
       );
     }
 
     return (
-      <div className="aspect-video w-full overflow-hidden rounded-lg bg-black">
+      <div className="aspect-video w-full bg-black">
         <video
           ref={videoRef}
           src={videoUrl}

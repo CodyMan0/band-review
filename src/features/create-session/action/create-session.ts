@@ -8,6 +8,16 @@ interface CreateSessionState {
   error?: string;
 }
 
+function isValidYoutubeUrl(url: string): boolean {
+  const patterns = [
+    /^https?:\/\/(?:www\.)?youtube\.com\/watch\?v=[^&\s]+/,
+    /^https?:\/\/youtu\.be\/[^?\s]+/,
+    /^https?:\/\/(?:www\.)?youtube\.com\/embed\/[^?\s]+/,
+    /^https?:\/\/(?:www\.)?youtube\.com\/shorts\/[^?\s]+/,
+  ];
+  return patterns.some((pattern) => pattern.test(url));
+}
+
 export async function createSession(
   _prevState: CreateSessionState,
   formData: FormData,
@@ -17,16 +27,21 @@ export async function createSession(
   const videoUrl = formData.get('video_url') as string;
   const videoType = formData.get('video_type') as string;
   const churchId = formData.get('church_id') as string;
+  const created_by = formData.get('created_by') as string;
 
   if (!title || !date || !videoUrl || !videoType || !churchId) {
     return { error: '모든 필드를 입력해주세요.' };
+  }
+
+  if (videoType === 'youtube' && !isValidYoutubeUrl(videoUrl)) {
+    return { error: '올바른 YouTube 링크를 입력해주세요. (예: https://youtube.com/watch?v=...)' };
   }
 
   const supabase = await createClient();
 
   const { data, error } = await supabase
     .from('sessions')
-    .insert({ title, date, video_url: videoUrl, video_type: videoType, church_id: churchId })
+    .insert({ title, date, video_url: videoUrl, video_type: videoType, church_id: churchId, created_by })
     .select('id')
     .single();
 
