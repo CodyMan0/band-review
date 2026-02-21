@@ -89,7 +89,7 @@ export function SessionDetailClient({
 
   return (
     <ProfileProvider>
-      <div className="flex flex-1 flex-col pb-20">
+      <div className="flex flex-1 flex-col overflow-x-hidden pb-20">
         {/* Back button */}
         <div className="px-2 py-3">
           <Link
@@ -110,14 +110,12 @@ export function SessionDetailClient({
         </div>
 
         {/* Video — edge to edge, no border */}
-        <div className="-mx-[1px]">
-          <VideoPlayer
-            ref={playerRef}
-            videoUrl={session.video_url}
-            videoType={session.video_type}
-            onTimeUpdate={handleTimeUpdate}
-          />
-        </div>
+        <VideoPlayer
+          ref={playerRef}
+          videoUrl={session.video_url}
+          videoType={session.video_type}
+          onTimeUpdate={handleTimeUpdate}
+        />
 
         {/* Timeline markers */}
         <TimelineMarkers
@@ -219,7 +217,7 @@ export function SessionDetailClient({
       {/* Fixed bottom comment input */}
       {!replyTo && !isPraiseMode && (
         <div className="fixed inset-x-0 bottom-0 z-30 border-t border-border/60 bg-background/95 backdrop-blur-md">
-          <div className="mx-auto flex w-full min-w-[380px] max-w-[540px] items-center gap-2 px-4 py-2.5">
+          <div className="mx-auto flex w-full max-w-[540px] items-center gap-2 px-4 py-2.5">
             <div className="flex-1">
               <CommentForm
                 sessionId={session.id}
@@ -244,7 +242,7 @@ export function SessionDetailClient({
           className="fixed inset-x-0 bottom-0 z-30 border-t border-amber-200/60 bg-amber-50/95 backdrop-blur-md"
           style={{ animation: "slideUp 0.18s ease-out" }}
         >
-          <div className="mx-auto w-full min-w-[380px] max-w-[540px] px-4 py-2.5">
+          <div className="mx-auto w-full max-w-[540px] px-4 py-2.5">
             <PraiseForm
               sessionId={session.id}
               currentTime={currentTime}
@@ -261,7 +259,7 @@ export function SessionDetailClient({
           className="fixed inset-x-0 bottom-0 z-40 border-t border-border/60 bg-background/95 shadow-lg backdrop-blur-md"
           style={{ animation: "slideUp 0.18s ease-out" }}
         >
-          <div className="mx-auto w-full min-w-[380px] max-w-[540px] px-4 py-2.5">
+          <div className="mx-auto w-full max-w-[540px] px-4 py-2.5">
             <div className="mb-2 flex items-center justify-between">
               <span className="text-xs font-medium text-muted-foreground">
                 답글 달기

@@ -50,7 +50,7 @@ export function InquiryButton() {
       {/* FAB — 문의 (좌측, 새 세션 FAB와 겹치지 않게) */}
       <button
         onClick={handleOpen}
-        className="fixed bottom-6 left-1/2 z-30 flex h-11 w-11 -translate-x-[calc(min(270px,50vw)-8px)] items-center justify-center rounded-full border border-border bg-background text-muted-foreground shadow-md transition-all active:scale-95 hover:text-foreground"
+        className="fixed bottom-6 left-4 z-30 flex h-11 w-11 items-center justify-center rounded-full border border-border bg-background text-muted-foreground shadow-md transition-all active:scale-95 hover:text-foreground sm:left-1/2 sm:-translate-x-[calc(min(270px,50vw)-8px)]"
         aria-label="문의하기"
       >
         <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
@@ -69,7 +69,7 @@ export function InquiryButton() {
 
           {/* Bottom sheet */}
           <div
-            className="relative w-full min-w-[380px] max-w-[540px] rounded-t-2xl bg-background px-5 pb-8 pt-5 shadow-xl"
+            className="relative w-full max-w-[540px] rounded-t-2xl bg-background px-5 pb-8 pt-5 shadow-xl"
             style={{ animation: 'slideUp 0.2s ease-out' }}
           >
             {/* Handle */}

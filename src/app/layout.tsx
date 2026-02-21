@@ -39,7 +39,7 @@ export default function RootLayout({
       </head>
       <body className="bg-background text-foreground">
         {/* Mobile app shell — centered, phone-width */}
-        <div className="mx-auto flex min-h-dvh w-full min-w-[380px] max-w-[540px] flex-col">
+        <div className="mx-auto flex min-h-dvh w-full max-w-[540px] flex-col">
           {children}
         </div>
       </body>

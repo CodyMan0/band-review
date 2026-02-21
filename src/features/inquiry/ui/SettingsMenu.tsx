@@ -90,7 +90,7 @@ export function SettingsMenu() {
           <div className="absolute inset-0 bg-black/30" onClick={handleClose} />
 
           <div
-            className="relative w-full min-w-[380px] max-w-[540px] rounded-t-2xl bg-background px-5 pb-8 pt-5 shadow-xl"
+            className="relative w-full max-w-[540px] rounded-t-2xl bg-background px-5 pb-8 pt-5 shadow-xl"
             style={{ animation: "slideUp 0.2s ease-out" }}
           >
             <div className="mx-auto mb-4 h-1 w-10 rounded-full bg-border" />
