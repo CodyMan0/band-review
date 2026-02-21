@@ -1,0 +1,138 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Warm off-white backgrounds — feels like parchment, not a hospital */
+    --background: 36 25% 97%;
+    --foreground: 222 20% 16%;
+
+    --card: 36 20% 99%;
+    --card-foreground: 222 20% 16%;
+
+    --popover: 36 20% 99%;
+    --popover-foreground: 222 20% 16%;
+
+    /* Warm indigo — spiritual depth without corporate coldness */
+    --primary: 232 48% 48%;
+    --primary-foreground: 0 0% 100%;
+
+    /* Soft amber secondary — warmth, community */
+    --secondary: 38 72% 92%;
+    --secondary-foreground: 222 20% 16%;
+
+    /* Warm muted tones */
+    --muted: 36 18% 93%;
+    --muted-foreground: 222 12% 48%;
+
+    /* Gentle accent */
+    --accent: 232 30% 94%;
+    --accent-foreground: 232 48% 40%;
+
+    --destructive: 4 72% 55%;
+    --destructive-foreground: 0 0% 100%;
+
+    /* Subtle warm borders */
+    --border: 36 16% 88%;
+    --input: 36 16% 88%;
+    --ring: 232 48% 48%;
+
+    /* Button states */
+    --btn-background: 36 16% 91%;
+    --btn-background-hover: 232 48% 48%;
+
+    /* Chart colors — warm and friendly */
+    --chart-1: 232 48% 55%;
+    --chart-2: 165 42% 47%;
+    --chart-3: 38 72% 58%;
+    --chart-4: 280 38% 58%;
+    --chart-5: 14 68% 58%;
+
+    --radius: 0.625rem;
+  }
+
+  .dark {
+    --background: 222 22% 10%;
+    --foreground: 36 18% 93%;
+
+    --card: 222 22% 13%;
+    --card-foreground: 36 18% 93%;
+
+    --popover: 222 22% 13%;
+    --popover-foreground: 36 18% 93%;
+
+    --primary: 232 55% 62%;
+    --primary-foreground: 222 22% 10%;
+
+    --secondary: 222 18% 18%;
+    --secondary-foreground: 36 18% 88%;
+
+    --muted: 222 18% 18%;
+    --muted-foreground: 222 12% 58%;
+
+    --accent: 232 30% 20%;
+    --accent-foreground: 232 55% 72%;
+
+    --destructive: 4 62% 48%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 222 18% 20%;
+    --input: 222 18% 20%;
+    --ring: 232 55% 62%;
+
+    --btn-background: 222 18% 18%;
+    --btn-background-hover: 232 55% 62%;
+
+    --chart-1: 232 55% 65%;
+    --chart-2: 165 48% 52%;
+    --chart-3: 38 68% 62%;
+    --chart-4: 280 45% 62%;
+    --chart-5: 14 65% 62%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+}
+
+/* ── Shared animations ── */
+@keyframes modalIn {
+  from {
+    opacity: 0;
+    transform: translateY(12px) scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ── Utility: hide scrollbar but keep scroll functionality ── */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.no-scrollbar {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
