@@ -1,10 +1,10 @@
-import Link from 'next/link';
+import Link from "next/link";
 
-import { getDashboardStats } from '@/entities/session/action/get-dashboard-stats';
-import { getSessions } from '@/entities/session/action/get-sessions';
-import { SessionCard } from '@/entities/session/ui/SessionCard';
-import { SettingsMenu } from '@/features/inquiry/ui/SettingsMenu';
-import { Button } from '@/shared/ui';
+import { getDashboardStats } from "@/entities/session/action/get-dashboard-stats";
+import { getSessions } from "@/entities/session/action/get-sessions";
+import { SessionCard } from "@/entities/session/ui/SessionCard";
+import { SettingsMenu } from "@/features/inquiry/ui/SettingsMenu";
+import { Button } from "@/shared/ui";
 
 export default async function HomePage() {
   const [sessions, stats] = await Promise.all([
@@ -18,8 +18,9 @@ export default async function HomePage() {
       <div className="px-5">
         <div className="flex items-start justify-between">
           <div>
-            <p className="text-xs font-medium text-muted-foreground">🎵 Harmony Band</p>
-            <h1 className="mt-1 text-[22px] font-bold tracking-tight">대시보드</h1>
+            <h1 className="mt-1 text-[22px] font-bold tracking-tight">
+              대시보드
+            </h1>
           </div>
           <SettingsMenu />
         </div>
@@ -33,13 +34,15 @@ export default async function HomePage() {
       </div>
 
       {/* Divider */}
-      <div className="mx-5 mt-6 mb-4 h-px bg-border" />
+      <div className="mx-5 mb-4 mt-6 h-px bg-border" />
 
       {/* Session list section */}
       <div className="flex-1 px-5">
         <div className="mb-3 flex items-center justify-between">
           <h2 className="text-base font-bold">예배 목록</h2>
-          <span className="text-xs text-muted-foreground">{sessions.length}개</span>
+          <span className="text-xs text-muted-foreground">
+            {sessions.length}개
+          </span>
         </div>
 
         {sessions.length === 0 ? (
@@ -60,7 +63,12 @@ export default async function HomePage() {
       >
         <Button className="h-12 w-12 rounded-full p-0 shadow-lg active:scale-95">
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-            <path d="M10 3V17M3 10H17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+            <path
+              d="M10 3V17M3 10H17"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+            />
           </svg>
         </Button>
       </Link>
@@ -68,12 +76,22 @@ export default async function HomePage() {
   );
 }
 
-function StatCard({ label, value, unit }: { label: string; value: number | string; unit?: string }) {
+function StatCard({
+  label,
+  value,
+  unit,
+}: {
+  label: string;
+  value: number | string;
+  unit?: string;
+}) {
   return (
     <div className="flex min-w-[calc(50%-4px)] flex-1 flex-col rounded-xl border border-border bg-card px-4 py-3">
       <span className="text-[11px] text-muted-foreground">{label}</span>
       <div className="mt-1 flex items-baseline gap-0.5">
-        <span className="text-xl font-bold tracking-tight text-foreground">{value}</span>
+        <span className="text-xl font-bold tracking-tight text-foreground">
+          {value}
+        </span>
         {unit && <span className="text-xs text-muted-foreground">{unit}</span>}
       </div>
     </div>
@@ -83,9 +101,12 @@ function StatCard({ label, value, unit }: { label: string; value: number | strin
 function EmptyState() {
   return (
     <div className="flex flex-col items-center py-12">
-      <p className="text-sm font-medium text-muted-foreground">아직 등록된 예배가 없어요</p>
-      <p className="mt-1 text-xs text-muted-foreground">+ 버튼으로 첫 세션을 만들어보세요</p>
+      <p className="text-sm font-medium text-muted-foreground">
+        아직 등록된 예배가 없어요
+      </p>
+      <p className="mt-1 text-xs text-muted-foreground">
+        + 버튼으로 첫 세션을 만들어보세요
+      </p>
     </div>
   );
 }
-
