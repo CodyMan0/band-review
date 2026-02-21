@@ -2,6 +2,7 @@
 
 import { getPartConfig } from "@/shared/config/parts";
 import { formatTimestamp } from "@/shared/lib/format-time";
+import { CarrotClap, PartIcon } from "@/shared/ui/icons";
 
 import { type Praise } from "../model/praise.interface";
 
@@ -16,8 +17,8 @@ export function PraiseList({ praises, onSeek, highlightedId }: PraiseListProps) 
     return (
       <div className="flex flex-col items-center py-8">
         <p className="text-sm text-muted-foreground">아직 칭찬이 없어요</p>
-        <p className="mt-0.5 text-xs text-muted-foreground">
-          👏 버튼으로 잘한 부분을 칭찬해보세요
+        <p className="mt-0.5 flex items-center gap-1 text-xs text-muted-foreground">
+          <CarrotClap size={16} /> 버튼으로 잘한 부분을 칭찬해보세요
         </p>
       </div>
     );
@@ -35,7 +36,7 @@ export function PraiseList({ praises, onSeek, highlightedId }: PraiseListProps) 
             className={`flex items-start gap-3 border-b border-border/60 py-3 last:border-b-0 rounded-lg ${highlightedId === praise.id ? "flash-highlight" : ""}`}
           >
             <div className="flex shrink-0 flex-col items-center pt-0.5">
-              <span className="text-base">👏</span>
+              <CarrotClap size={20} />
             </div>
             <div className="min-w-0 flex-1">
               <div className="mb-1 flex flex-wrap items-center gap-1.5">
@@ -43,7 +44,7 @@ export function PraiseList({ praises, onSeek, highlightedId }: PraiseListProps) 
                 <span
                   className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-medium ${authorConfig.color}`}
                 >
-                  <span>{authorConfig.emoji}</span>
+                  <PartIcon part={praise.author_part} size={12} />
                   <span>{praise.author_name}</span>
                 </span>
                 {/* Arrow */}
@@ -63,7 +64,7 @@ export function PraiseList({ praises, onSeek, highlightedId }: PraiseListProps) 
                 <span
                   className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-medium ${targetConfig.color}`}
                 >
-                  <span>{targetConfig.emoji}</span>
+                  <PartIcon part={praise.target_part} size={12} />
                   <span>{targetConfig.label}</span>
                 </span>
                 {/* Timestamp */}

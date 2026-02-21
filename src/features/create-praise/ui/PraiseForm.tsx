@@ -7,6 +7,7 @@ import { getProfile } from "@/shared/config/profile";
 import { type Part, PARTS } from "@/shared/config/parts";
 import { formatTimestamp } from "@/shared/lib/format-time";
 import { Input } from "@/shared/ui";
+import { CarrotClap, PartIcon } from "@/shared/ui/icons";
 
 interface PraiseFormProps {
   sessionId: string;
@@ -83,7 +84,7 @@ export function PraiseForm({
                 : "bg-muted text-muted-foreground"
             }`}
           >
-            {p.emoji} {p.label}
+            <PartIcon part={p.value} size={12} className="inline-block" /> {p.label}
           </button>
         ))}
       </div>
@@ -91,7 +92,7 @@ export function PraiseForm({
       {/* Input row */}
       <div className="flex items-center gap-2">
         <span className="shrink-0 inline-flex items-center gap-1 rounded-full bg-amber-50 border border-amber-200 px-2.5 py-1 text-xs font-semibold text-amber-600 select-none">
-          👏 {formatTimestamp(currentTime)}
+          <CarrotClap size={14} /> {formatTimestamp(currentTime)}
         </span>
 
         <Input
@@ -125,7 +126,7 @@ export function PraiseForm({
               <path d="M13 7a6 6 0 0 0-6-6V2.5A4.5 4.5 0 0 1 11.5 7H13z" />
             </svg>
           ) : (
-            <span className="text-sm">👏</span>
+            <CarrotClap size={16} className="text-white" />
           )}
         </button>
 

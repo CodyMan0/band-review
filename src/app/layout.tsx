@@ -1,7 +1,5 @@
 import '@/app/globals.css';
 
-import { GeistSans } from 'geist/font/sans';
-
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
   : 'http://localhost:3000';
@@ -30,7 +28,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="ko" className={GeistSans.className}>
+    <html lang="ko">
+      <head>
+        <link
+          rel="stylesheet"
+          as="style"
+          crossOrigin="anonymous"
+          href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
+        />
+      </head>
       <body className="bg-background text-foreground">
         {/* Mobile app shell — centered, phone-width */}
         <div className="mx-auto flex min-h-dvh w-full min-w-[380px] max-w-[540px] flex-col">

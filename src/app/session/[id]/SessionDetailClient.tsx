@@ -17,6 +17,7 @@ import { CommentForm } from "@/features/create-comment/ui/CommentForm";
 import { PraiseForm } from "@/features/create-praise/ui/PraiseForm";
 import { ProfileProvider } from "@/features/user-profile/ui/ProfileProvider";
 import { type Part, PARTS } from "@/shared/config/parts";
+import { CarrotClap, PartIcon } from "@/shared/ui/icons";
 
 interface Props {
   session: Session;
@@ -189,7 +190,7 @@ export function SessionDetailClient({
                         : "bg-muted text-muted-foreground"
                     }`}
                   >
-                    {p.emoji} {count}
+                    <PartIcon part={p.value} size={12} className="inline-block" /> {count}
                   </button>
                 );
               })}
@@ -230,7 +231,7 @@ export function SessionDetailClient({
               aria-label="칭찬하기"
               title="칭찬하기"
             >
-              <span className="text-sm">👏</span>
+              <CarrotClap size={18} />
             </button>
           </div>
         </div>

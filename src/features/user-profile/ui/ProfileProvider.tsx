@@ -16,14 +16,9 @@ export function ProfileProvider({ children }: { children: React.ReactNode }) {
   // Hydrating — render nothing to avoid flash
   if (profile === undefined) return null;
 
-  // No profile yet — show setup modal over the content
+  // No profile yet — show setup flow
   if (profile === null) {
-    return (
-      <>
-        {children}
-        <ProfileSetup onComplete={setProfile} />
-      </>
-    );
+    return <ProfileSetup onComplete={setProfile} />;
   }
 
   return <>{children}</>;

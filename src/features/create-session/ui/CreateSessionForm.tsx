@@ -3,10 +3,12 @@
 import { useActionState } from 'react';
 
 import { createSession } from '@/features/create-session/action/create-session';
+import { getProfile } from '@/shared/config/profile';
 import { Button, Input } from '@/shared/ui';
 
 export function CreateSessionForm() {
   const [state, formAction, isPending] = useActionState(createSession, {});
+  const profile = getProfile();
 
   return (
     <form action={formAction} className="flex flex-col gap-6">
@@ -55,6 +57,7 @@ export function CreateSessionForm() {
       </div>
 
       <input type="hidden" name="video_type" value="youtube" />
+      <input type="hidden" name="church_id" value={profile?.churchId ?? ''} />
 
       {/* Error */}
       {state.error && (

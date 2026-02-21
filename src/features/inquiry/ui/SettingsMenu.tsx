@@ -5,6 +5,7 @@ import { useState } from "react";
 import { createInquiry } from "@/features/inquiry/action/create-inquiry";
 import { getProfile } from "@/shared/config/profile";
 import { Button, Input } from "@/shared/ui";
+import { CarrotCheck } from "@/shared/ui/icons";
 
 type View = "closed" | "menu" | "inquiry";
 
@@ -186,9 +187,7 @@ export function SettingsMenu() {
             {/* Success view */}
             {view === "inquiry" && submitted && (
               <div className="flex flex-col items-center py-6">
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-accent text-xl">
-                  ✓
-                </div>
+                <CarrotCheck size={48} />
                 <p className="mt-3 text-base font-semibold">
                   문의가 접수되었어요
                 </p>

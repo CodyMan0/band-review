@@ -2,6 +2,7 @@
 
 import { type Part } from "@/shared/config/parts";
 
+import { CarrotMusic, CarrotSearch } from "@/shared/ui/icons";
 import { type CommentWithReplies } from "../model/comment.interface";
 import { CommentItem } from "./CommentItem";
 
@@ -30,7 +31,7 @@ export function CommentList({
       <div className="flex flex-col items-center justify-center px-4 text-center">
         {filterPart === "all" ? (
           <>
-            <div className="mb-3 text-3xl opacity-60">🎵</div>
+            <CarrotMusic size={48} className="mb-3 opacity-70" />
             <p className="mb-1 text-sm font-medium text-foreground/70">
               아직 피드백이 없어요
             </p>
@@ -40,7 +41,7 @@ export function CommentList({
           </>
         ) : (
           <>
-            <div className="mb-3 text-3xl opacity-60">🔍</div>
+            <CarrotSearch size={48} className="mb-3 opacity-70" />
             <p className="mb-1 text-sm font-medium text-foreground/70">
               해당 파트의 피드백이 없어요
             </p>

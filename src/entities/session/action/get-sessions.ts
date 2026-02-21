@@ -4,12 +4,13 @@ import { createClient } from '@/shared/utils/supabase/server';
 
 import { type SessionWithCommentCount } from '../model/session.interface';
 
-export async function getSessions(): Promise<SessionWithCommentCount[]> {
+export async function getSessions(churchId: string): Promise<SessionWithCommentCount[]> {
   const supabase = await createClient();
 
   const { data: sessions, error } = await supabase
     .from('sessions')
     .select('*')
+    .eq('church_id', churchId)
     .order('date', { ascending: false });
 
   if (error || !sessions) return [];

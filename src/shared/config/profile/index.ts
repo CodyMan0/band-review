@@ -3,6 +3,8 @@ import { type Part } from '@/shared/config/parts';
 export interface UserProfile {
   name: string;
   part: Part;
+  churchId: string;
+  churchName: string;
 }
 
 const PROFILE_KEY = 'harmony-band-profile';

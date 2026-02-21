@@ -5,6 +5,7 @@ import { useState } from "react";
 
 import { getPartConfig } from "@/shared/config/parts";
 import { formatTimestamp } from "@/shared/lib/format-time";
+import { PartIcon } from "@/shared/ui/icons";
 
 import { type CommentWithReplies } from "../model/comment.interface";
 
@@ -37,7 +38,7 @@ export function CommentItem({ comment, onSeek, onReply, isHighlighted }: Comment
             <span
               className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-xs font-medium ${partConfig.color}`}
             >
-              <span>{partConfig.emoji}</span>
+              <PartIcon part={comment.author_part} size={12} />
               <span>{comment.author_name}</span>
             </span>
 
@@ -138,7 +139,7 @@ export function CommentItem({ comment, onSeek, onReply, isHighlighted }: Comment
                       <span
                         className={`inline-flex items-center gap-1 rounded-full border px-2 py-0.5 text-xs font-medium ${replyPartConfig.color} mb-1`}
                       >
-                        <span>{replyPartConfig.emoji}</span>
+                        <PartIcon part={reply.author_part} size={12} />
                         <span>{reply.author_name}</span>
                       </span>
                       <p className="text-sm leading-relaxed text-foreground/85">

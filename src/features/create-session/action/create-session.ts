@@ -16,8 +16,9 @@ export async function createSession(
   const date = formData.get('date') as string;
   const videoUrl = formData.get('video_url') as string;
   const videoType = formData.get('video_type') as string;
+  const churchId = formData.get('church_id') as string;
 
-  if (!title || !date || !videoUrl || !videoType) {
+  if (!title || !date || !videoUrl || !videoType || !churchId) {
     return { error: '모든 필드를 입력해주세요.' };
   }
 
@@ -25,7 +26,7 @@ export async function createSession(
 
   const { data, error } = await supabase
     .from('sessions')
-    .insert({ title, date, video_url: videoUrl, video_type: videoType })
+    .insert({ title, date, video_url: videoUrl, video_type: videoType, church_id: churchId })
     .select('id')
     .single();
 
