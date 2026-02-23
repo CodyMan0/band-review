@@ -30,14 +30,16 @@ export async function saveSessionSongs(
   for (let i = 0; i < songs.length; i++) {
     const { name: songName, startTimeSec } = songs[i];
 
-    if (!songName.trim()) continue;
+    // Normalize: trim + collapse multiple spaces into one
+    const normalizedName = songName.trim().replace(/\s+/g, ' ');
+    if (!normalizedName) continue;
 
     // Try to find existing song
     const { data: existing } = await supabase
       .from('songs')
       .select('id')
       .eq('church_id', churchId)
-      .eq('name', songName)
+      .eq('name', normalizedName)
       .single();
 
     let songId: string;
@@ -48,7 +50,7 @@ export async function saveSessionSongs(
       // Insert new song
       const { data: newSong, error: insertError } = await supabase
         .from('songs')
-        .insert({ name: songName, church_id: churchId })
+        .insert({ name: normalizedName, church_id: churchId })
         .select('id')
         .single();
 

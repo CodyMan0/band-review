@@ -23,18 +23,19 @@ export function SongTimeline({ songs, onSeek, currentTime }: SongTimelineProps) 
   };
 
   return (
-    <div className="flex overflow-x-auto gap-1.5 no-scrollbar">
+    <div className="flex flex-wrap gap-1.5">
       {songs.map((song, index) => (
         <button
           key={song.id}
           onClick={() => onSeek(song.start_time_sec)}
-          className={`shrink-0 rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
+          className={`rounded-full px-2.5 py-1 text-[11px] font-medium transition-colors active:scale-95 ${
             isActive(index)
-              ? 'bg-primary text-primary-foreground'
+              ? 'bg-primary text-primary-foreground shadow-sm'
               : 'bg-muted text-muted-foreground'
           }`}
         >
-          {song.song_name} ({formatTimestamp(song.start_time_sec)})
+          {song.song_name}
+          <span className="ml-1 opacity-70">{formatTimestamp(song.start_time_sec)}</span>
         </button>
       ))}
     </div>

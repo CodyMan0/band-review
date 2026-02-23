@@ -143,18 +143,18 @@ export function SessionDetailClient({
           onMarkerClick={handleMarkerClick}
         />
 
-        {/* Song timeline chips */}
-        {sessionSongs.length > 0 && (
-          <div className="px-5 py-2">
-            <SongTimeline songs={sessionSongs} onSeek={handleSeek} currentTime={currentTime} />
-          </div>
-        )}
-
         {/* Session info */}
-        <div className="px-5 pb-3">
+        <div className="px-5 pt-3 pb-2">
           <h1 className="text-base font-bold leading-snug">{session.title}</h1>
           <p className="mt-0.5 text-xs text-muted-foreground">{session.date}</p>
         </div>
+
+        {/* Song timeline chips */}
+        {sessionSongs.length > 0 && (
+          <div className="px-5 pb-3">
+            <SongTimeline songs={sessionSongs} onSeek={handleSeek} currentTime={currentTime} />
+          </div>
+        )}
 
         {/* Tab switcher — full width, 50/50 */}
         <div className="flex w-full border-b border-border/40">
