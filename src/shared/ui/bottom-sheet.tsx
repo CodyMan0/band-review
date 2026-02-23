@@ -1,5 +1,6 @@
 'use client';
 
+import * as VisuallyHidden from '@radix-ui/react-visually-hidden';
 import { Drawer } from 'vaul';
 
 import { cn } from './lib/utils';
@@ -22,6 +23,9 @@ export function BottomSheet({ open, onOpenChange, children, className }: BottomS
             className,
           )}
         >
+          <VisuallyHidden.Root>
+            <Drawer.Title>메뉴</Drawer.Title>
+          </VisuallyHidden.Root>
           <Drawer.Handle className="mx-auto mb-4 h-1 w-10 rounded-full bg-border" />
           {children}
         </Drawer.Content>

@@ -2,7 +2,7 @@
 
 import { format } from 'date-fns';
 import { ko } from 'date-fns/locale';
-import { motion, useMotionValue, useTransform, type PanInfo } from 'framer-motion';
+import { animate, motion, useMotionValue, useTransform, type PanInfo } from 'framer-motion';
 import Link from 'next/link';
 import { useRef, useState } from 'react';
 
@@ -13,66 +13,70 @@ interface SessionCardProps {
   onDelete?: (sessionId: string) => void;
 }
 
-const DELETE_THRESHOLD = -80;
+const SNAP_OPEN = -52;
+const TRIGGER_THRESHOLD = -30;
 
 export function SessionCard({ session, onDelete }: SessionCardProps) {
   const sessionDate = new Date(session.date);
   const dateStr = format(sessionDate, 'M월 d일 (EEE)', { locale: ko });
   const [isDragging, setIsDragging] = useState(false);
   const x = useMotionValue(0);
-  const deleteOpacity = useTransform(x, [-100, -60, 0], [1, 0.5, 0]);
+  const deleteScale = useTransform(x, [0, SNAP_OPEN], [0.6, 1]);
+  const deleteOpacity = useTransform(x, [0, SNAP_OPEN * 0.5, SNAP_OPEN], [0, 0.6, 1]);
   const constraintsRef = useRef(null);
 
   const handleDragEnd = (_: unknown, info: PanInfo) => {
     setIsDragging(false);
-    if (info.offset.x < DELETE_THRESHOLD) {
-      // Snap to show delete button
-      x.set(-80);
+    if (info.offset.x < TRIGGER_THRESHOLD) {
+      animate(x, SNAP_OPEN, { type: 'spring', stiffness: 500, damping: 35 });
     } else {
-      x.set(0);
+      animate(x, 0, { type: 'spring', stiffness: 500, damping: 35 });
     }
   };
 
   const handleDelete = () => {
+    animate(x, 0, { type: 'spring', stiffness: 500, damping: 35 });
     onDelete?.(session.id);
   };
 
   const handleClick = (e: React.MouseEvent) => {
     if (isDragging || x.get() < -10) {
       e.preventDefault();
-      x.set(0);
+      animate(x, 0, { type: 'spring', stiffness: 500, damping: 35 });
     }
   };
 
   return (
     <div className="relative overflow-hidden rounded-xl" ref={constraintsRef}>
-      {/* Delete button behind */}
+      {/* Delete action behind */}
       <motion.div
-        className="absolute inset-y-0 right-0 flex w-20 items-center justify-center rounded-r-xl bg-destructive"
+        className="absolute inset-y-0 right-0 flex w-[52px] items-center justify-center"
         style={{ opacity: deleteOpacity }}
       >
         <button
           onClick={handleDelete}
-          className="flex h-full w-full items-center justify-center text-white"
+          className="flex h-full w-full items-center justify-center rounded-r-xl bg-destructive text-white active:bg-destructive/80"
         >
-          <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
-            <path d="M3 5H17M8 5V3C8 2.45 8.45 2 9 2H11C11.55 2 12 2.45 12 3V5M15 5V17C15 17.55 14.55 18 14 18H6C5.45 18 5 17.55 5 17V5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
+          <motion.div style={{ scale: deleteScale }}>
+            <svg width="18" height="18" viewBox="0 0 18 18" fill="none">
+              <path d="M3 5H15M7 5V3.5C7 3.1 7.3 2.75 7.75 2.75H10.25C10.7 2.75 11 3.1 11 3.5V5M13.5 5V14.5C13.5 14.9 13.2 15.25 12.75 15.25H5.25C4.8 15.25 4.5 14.9 4.5 14.5V5" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+            </svg>
+          </motion.div>
         </button>
       </motion.div>
 
       {/* Swipeable card */}
       <motion.div
         drag="x"
-        dragConstraints={{ left: -80, right: 0 }}
-        dragElastic={0.1}
+        dragConstraints={{ left: SNAP_OPEN, right: 0 }}
+        dragElastic={0.08}
         style={{ x }}
         onDragStart={() => setIsDragging(true)}
         onDragEnd={handleDragEnd}
+        className="relative z-10"
       >
         <Link href={`/session/${session.id}`} onClick={handleClick} className="group block">
-          <div className="flex items-center gap-3 rounded-xl border border-border/50 bg-card px-4 py-3.5 transition-all duration-150 active:scale-[0.98] active:bg-accent/50">
-            {/* Left: info */}
+          <div className="flex items-center gap-3 rounded-xl border border-border/50 bg-card px-4 py-3.5 transition-colors duration-150 active:bg-accent/50">
             <div className="flex-1 min-w-0">
               <p className="truncate text-[15px] font-semibold leading-snug">{session.title}</p>
               <p className="mt-0.5 text-xs text-muted-foreground">
@@ -80,8 +84,6 @@ export function SessionCard({ session, onDelete }: SessionCardProps) {
                 {session.created_by && <span> · {session.created_by}</span>}
               </p>
             </div>
-
-            {/* Right: counts + chevron */}
             <div className="flex shrink-0 items-center gap-1.5">
               {session.comment_count > 0 && (
                 <span className="rounded-full bg-primary/10 px-2 py-0.5 text-[11px] font-medium text-primary">
