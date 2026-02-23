@@ -84,7 +84,7 @@ export function SwipeToDelete({ onDelete, children, className, enabled = true }:
         dragDirectionLock
         dragConstraints={{ left: -DELETE_WIDTH, right: 0 }}
         dragElastic={0.1}
-        style={{ x }}
+        style={{ x, touchAction: 'pan-y' }}
         onDragEnd={handleDragEnd}
         className="relative z-10 bg-background"
       >

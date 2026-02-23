@@ -30,7 +30,7 @@ export function PraiseList({ praises, onSeek, onDelete, currentUserName, highlig
   return (
     <div className="flex flex-col">
       {praises.map((praise) => {
-        const isOwn = currentUserName && praise.author_name === currentUserName;
+        const isOwn = !!currentUserName && praise.author_name?.trim() === currentUserName.trim();
         return (
           <PraiseItem
             key={praise.id}

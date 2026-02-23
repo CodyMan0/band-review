@@ -61,7 +61,7 @@ export function CommentList({
   return (
     <div className="flex flex-col">
       {filtered.map((comment) => {
-        const isOwn = !!currentUserName && comment.author_name === currentUserName;
+        const isOwn = !!currentUserName && comment.author_name?.trim() === currentUserName.trim();
         return (
           <CommentItem
             key={comment.id}
