@@ -14,7 +14,7 @@ import { SongCard } from '@/entities/song/ui/SongCard';
 import { deleteSession } from '@/features/delete-session/action/delete-session';
 import { SettingsMenu } from '@/features/inquiry/ui/SettingsMenu';
 import { getProfile } from '@/shared/config/profile';
-import { Button, Input, ScrollArea } from '@/shared/ui';
+import { BottomSheet, Button, Input, ScrollArea } from '@/shared/ui';
 import { CarrotEmpty } from '@/shared/ui/icons';
 
 export function HomeClient() {
@@ -265,75 +265,57 @@ export function HomeClient() {
       </Link>
 
       {/* Delete confirmation bottom sheet */}
-      {deleteTarget && !deleteError && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center">
-          <div className="absolute inset-0 bg-black/30" onClick={handleDeleteClose} />
-          <div
-            className="relative w-full max-w-[540px] rounded-t-2xl bg-background px-5 pb-8 pt-5 shadow-xl"
-            style={{ animation: 'slideUp 0.2s ease-out' }}
-          >
-            <div className="mx-auto mb-4 h-1 w-10 rounded-full bg-border" />
-            <div className="flex flex-col items-center py-4">
-              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-destructive/10">
-                <svg width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="hsl(var(--destructive))" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M4 7H24M10 7V5C10 4.2 10.6 3.5 11.5 3.5H16.5C17.4 3.5 18 4.2 18 5V7M21 7V23C21 23.8 20.4 24.5 19.5 24.5H8.5C7.6 24.5 7 23.8 7 23V7" />
-                </svg>
-              </div>
-              <p className="mt-3 text-base font-semibold">세션을 삭제할까요?</p>
-              <p className="mt-1 text-center text-sm text-muted-foreground">
-                &quot;{deleteTarget.title}&quot;을(를) 삭제하면 복구할 수 없어요
-              </p>
-              <div className="mt-5 flex w-full gap-2">
-                <Button
-                  onClick={handleDeleteClose}
-                  variant="outline"
-                  className="h-11 flex-1 rounded-xl text-sm"
-                >
-                  취소
-                </Button>
-                <Button
-                  onClick={handleDeleteConfirm}
-                  variant="destructive"
-                  disabled={isDeleting}
-                  className="h-11 flex-1 rounded-xl text-sm font-semibold"
-                >
-                  {isDeleting ? '삭제 중...' : '삭제하기'}
-                </Button>
-              </div>
-            </div>
+      <BottomSheet open={!!deleteTarget && !deleteError} onOpenChange={(open) => { if (!open) handleDeleteClose(); }}>
+        <div className="flex flex-col items-center py-4">
+          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-destructive/10">
+            <svg width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="hsl(var(--destructive))" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M4 7H24M10 7V5C10 4.2 10.6 3.5 11.5 3.5H16.5C17.4 3.5 18 4.2 18 5V7M21 7V23C21 23.8 20.4 24.5 19.5 24.5H8.5C7.6 24.5 7 23.8 7 23V7" />
+            </svg>
+          </div>
+          <p className="mt-3 text-base font-semibold">세션을 삭제할까요?</p>
+          <p className="mt-1 text-center text-sm text-muted-foreground">
+            &quot;{deleteTarget?.title}&quot;을(를) 삭제하면 복구할 수 없어요
+          </p>
+          <div className="mt-5 flex w-full gap-2">
+            <Button
+              onClick={handleDeleteClose}
+              variant="outline"
+              className="h-11 flex-1 rounded-xl text-sm"
+            >
+              취소
+            </Button>
+            <Button
+              onClick={handleDeleteConfirm}
+              variant="destructive"
+              disabled={isDeleting}
+              className="h-11 flex-1 rounded-xl text-sm font-semibold"
+            >
+              {isDeleting ? '삭제 중...' : '삭제하기'}
+            </Button>
           </div>
         </div>
-      )}
+      </BottomSheet>
 
       {/* Delete error modal */}
-      {deleteTarget && deleteError && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center">
-          <div className="absolute inset-0 bg-black/30" onClick={handleDeleteClose} />
-          <div
-            className="relative w-full max-w-[540px] rounded-t-2xl bg-background px-5 pb-8 pt-5 shadow-xl"
-            style={{ animation: 'slideUp 0.2s ease-out' }}
-          >
-            <div className="mx-auto mb-4 h-1 w-10 rounded-full bg-border" />
-            <div className="flex flex-col items-center py-4">
-              <div className="flex h-14 w-14 items-center justify-center rounded-full bg-amber-100">
-                <svg width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="#D97706" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
-                  <path d="M14 10V16M14 20H14.01M3.5 22.5H24.5L14 4L3.5 22.5Z" />
-                </svg>
-              </div>
-              <p className="mt-3 text-base font-semibold">삭제할 수 없어요</p>
-              <p className="mt-1 text-center text-sm text-muted-foreground">
-                {deleteError}
-              </p>
-              <Button
-                onClick={handleDeleteClose}
-                className="mt-5 h-11 w-full rounded-xl text-sm font-semibold"
-              >
-                확인
-              </Button>
-            </div>
+      <BottomSheet open={!!deleteTarget && !!deleteError} onOpenChange={(open) => { if (!open) handleDeleteClose(); }}>
+        <div className="flex flex-col items-center py-4">
+          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-amber-100">
+            <svg width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="#D97706" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M14 10V16M14 20H14.01M3.5 22.5H24.5L14 4L3.5 22.5Z" />
+            </svg>
           </div>
+          <p className="mt-3 text-base font-semibold">삭제할 수 없어요</p>
+          <p className="mt-1 text-center text-sm text-muted-foreground">
+            {deleteError}
+          </p>
+          <Button
+            onClick={handleDeleteClose}
+            className="mt-5 h-11 w-full rounded-xl text-sm font-semibold"
+          >
+            확인
+          </Button>
         </div>
-      )}
+      </BottomSheet>
     </div>
   );
 }

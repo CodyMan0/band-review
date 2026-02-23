@@ -4,7 +4,7 @@ import { useState } from "react";
 
 import { createInquiry } from "@/features/inquiry/action/create-inquiry";
 import { getProfile } from "@/shared/config/profile";
-import { Button, Input } from "@/shared/ui";
+import { BottomSheet, Button, Input } from "@/shared/ui";
 import { CarrotCheck } from "@/shared/ui/icons";
 
 type View = "closed" | "menu" | "inquiry";
@@ -84,17 +84,8 @@ export function SettingsMenu() {
         </svg>
       </button>
 
-      {/* Bottom sheet overlay */}
-      {view !== "closed" && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center">
-          <div className="absolute inset-0 bg-black/30" onClick={handleClose} />
-
-          <div
-            className="relative w-full max-w-[540px] rounded-t-2xl bg-background px-5 pb-8 pt-5 shadow-xl"
-            style={{ animation: "slideUp 0.2s ease-out" }}
-          >
-            <div className="mx-auto mb-4 h-1 w-10 rounded-full bg-border" />
-
+      {/* Bottom sheet */}
+      <BottomSheet open={view !== "closed"} onOpenChange={(open) => { if (!open) handleClose(); }}>
             {/* Menu view */}
             {view === "menu" && !showLogoutConfirm && (
               <div className="flex flex-col gap-1">
@@ -272,9 +263,7 @@ export function SettingsMenu() {
                 </div>
               </div>
             )}
-          </div>
-        </div>
-      )}
+      </BottomSheet>
     </>
   );
 }

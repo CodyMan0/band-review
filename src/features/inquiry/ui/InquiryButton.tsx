@@ -4,7 +4,7 @@ import { useState } from 'react';
 
 import { createInquiry } from '@/features/inquiry/action/create-inquiry';
 import { getProfile } from '@/shared/config/profile';
-import { Button, Input } from '@/shared/ui';
+import { BottomSheet, Button, Input } from '@/shared/ui';
 
 export function InquiryButton() {
   const [isOpen, setIsOpen] = useState(false);
@@ -58,93 +58,75 @@ export function InquiryButton() {
         </svg>
       </button>
 
-      {/* Modal overlay */}
-      {isOpen && (
-        <div className="fixed inset-0 z-50 flex items-end justify-center">
-          {/* Backdrop */}
-          <div
-            className="absolute inset-0 bg-black/30"
-            onClick={() => setIsOpen(false)}
-          />
-
-          {/* Bottom sheet */}
-          <div
-            className="relative w-full max-w-[540px] rounded-t-2xl bg-background px-5 pb-8 pt-5 shadow-xl"
-            style={{ animation: 'slideUp 0.2s ease-out' }}
-          >
-            {/* Handle */}
-            <div className="mx-auto mb-4 h-1 w-10 rounded-full bg-border" />
-
-            {submitted ? (
-              <div className="flex flex-col items-center py-6">
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-accent text-xl">
-                  ✓
-                </div>
-                <p className="mt-3 text-base font-semibold">문의가 접수되었어요</p>
-                <p className="mt-1 text-sm text-muted-foreground">감사합니다!</p>
-                <Button
-                  onClick={() => setIsOpen(false)}
-                  variant="outline"
-                  className="mt-5 rounded-full px-6"
-                  size="sm"
-                >
-                  닫기
-                </Button>
-              </div>
-            ) : (
-              <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-                <div>
-                  <h2 className="text-lg font-bold">문의하기</h2>
-                  <p className="mt-0.5 text-xs text-muted-foreground">
-                    건의사항이나 궁금한 점을 남겨주세요
-                  </p>
-                </div>
-
-                <div className="flex flex-col gap-1.5">
-                  <label htmlFor="inquiry-name" className="text-sm font-medium">
-                    이름
-                  </label>
-                  <Input
-                    id="inquiry-name"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    placeholder="이름"
-                    required
-                    className="h-10 rounded-xl text-sm"
-                  />
-                </div>
-
-                <div className="flex flex-col gap-1.5">
-                  <label htmlFor="inquiry-content" className="text-sm font-medium">
-                    내용
-                  </label>
-                  <textarea
-                    id="inquiry-content"
-                    value={content}
-                    onChange={(e) => setContent(e.target.value)}
-                    placeholder="문의 내용을 입력해주세요"
-                    required
-                    rows={3}
-                    className="w-full resize-none rounded-xl border border-input bg-background px-3 py-2.5 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-                  />
-                </div>
-
-                {error && (
-                  <p className="text-sm text-destructive">{error}</p>
-                )}
-
-                <Button
-                  type="submit"
-                  disabled={isSubmitting || !name.trim() || !content.trim()}
-                  className="h-11 w-full rounded-xl text-sm font-semibold active:scale-[0.98]"
-                >
-                  {isSubmitting ? '보내는 중...' : '보내기'}
-                </Button>
-              </form>
-            )}
+      <BottomSheet open={isOpen} onOpenChange={setIsOpen}>
+        {submitted ? (
+          <div className="flex flex-col items-center py-6">
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-accent text-xl">
+              ✓
+            </div>
+            <p className="mt-3 text-base font-semibold">문의가 접수되었어요</p>
+            <p className="mt-1 text-sm text-muted-foreground">감사합니다!</p>
+            <Button
+              onClick={() => setIsOpen(false)}
+              variant="outline"
+              className="mt-5 rounded-full px-6"
+              size="sm"
+            >
+              닫기
+            </Button>
           </div>
-        </div>
-      )}
+        ) : (
+          <form onSubmit={handleSubmit} className="flex flex-col gap-4">
+            <div>
+              <h2 className="text-lg font-bold">문의하기</h2>
+              <p className="mt-0.5 text-xs text-muted-foreground">
+                건의사항이나 궁금한 점을 남겨주세요
+              </p>
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <label htmlFor="inquiry-name" className="text-sm font-medium">
+                이름
+              </label>
+              <Input
+                id="inquiry-name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                placeholder="이름"
+                required
+                className="h-10 rounded-xl text-sm"
+              />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <label htmlFor="inquiry-content" className="text-sm font-medium">
+                내용
+              </label>
+              <textarea
+                id="inquiry-content"
+                value={content}
+                onChange={(e) => setContent(e.target.value)}
+                placeholder="문의 내용을 입력해주세요"
+                required
+                rows={3}
+                className="w-full resize-none rounded-xl border border-input bg-background px-3 py-2.5 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+              />
+            </div>
+
+            {error && (
+              <p className="text-sm text-destructive">{error}</p>
+            )}
+
+            <Button
+              type="submit"
+              disabled={isSubmitting || !name.trim() || !content.trim()}
+              className="h-11 w-full rounded-xl text-sm font-semibold active:scale-[0.98]"
+            >
+              {isSubmitting ? '보내는 중...' : '보내기'}
+            </Button>
+          </form>
+        )}
+      </BottomSheet>
     </>
   );
 }

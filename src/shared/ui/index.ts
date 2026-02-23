@@ -1,3 +1,4 @@
+export { BottomSheet } from "./bottom-sheet";
 export { Button } from "./button";
 export { Card, CardContent, CardHeader } from "./card";
 export { ExternalLink } from "./ExternalLink";
