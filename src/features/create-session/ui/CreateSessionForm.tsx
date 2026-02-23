@@ -3,6 +3,7 @@
 import { useActionState } from 'react';
 
 import { createSession } from '@/features/create-session/action/create-session';
+import { SongListInput } from '@/features/create-session-songs/ui/SongListInput';
 import { getProfile } from '@/shared/config/profile';
 import { Button, Input } from '@/shared/ui';
 
@@ -54,6 +55,14 @@ export function CreateSessionForm() {
           required
           className="h-11 rounded-xl font-mono text-sm"
         />
+      </div>
+
+      {/* Songs (optional) */}
+      <div className="flex flex-col gap-1.5">
+        <label className="text-sm font-medium">
+          곡 목록 <span className="text-xs text-muted-foreground font-normal">(선택)</span>
+        </label>
+        <SongListInput />
       </div>
 
       <input type="hidden" name="video_type" value="youtube" />

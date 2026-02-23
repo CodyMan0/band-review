@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useRef, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import { useCallback, useEffect, useRef, useState } from "react";
 
 import { type CommentWithReplies } from "@/entities/comment/model/comment.interface";
 import { CommentList } from "@/entities/comment/ui/CommentList";
@@ -16,6 +17,8 @@ import {
 import { CommentForm } from "@/features/create-comment/ui/CommentForm";
 import { PraiseForm } from "@/features/create-praise/ui/PraiseForm";
 import { ProfileProvider } from "@/features/user-profile/ui/ProfileProvider";
+import { type SessionSongWithName } from "@/entities/song/model/song.interface";
+import { SongTimeline } from "@/entities/song/ui/SongTimeline";
 import { type Part, PARTS } from "@/shared/config/parts";
 import { CarrotClap, PartIcon } from "@/shared/ui/icons";
 
@@ -23,13 +26,16 @@ interface Props {
   session: Session;
   initialComments: CommentWithReplies[];
   initialPraises: Praise[];
+  sessionSongs: SessionSongWithName[];
 }
 
 export function SessionDetailClient({
   session,
   initialComments,
   initialPraises,
+  sessionSongs,
 }: Props) {
+  const searchParams = useSearchParams();
   const playerRef = useRef<VideoPlayerRef>(null);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
@@ -38,6 +44,16 @@ export function SessionDetailClient({
   const [activeTab, setActiveTab] = useState<"feedback" | "praise">("feedback");
   const [isPraiseMode, setIsPraiseMode] = useState(false);
   const [highlightedId, setHighlightedId] = useState<string | null>(null);
+
+  useEffect(() => {
+    const t = searchParams.get('t');
+    if (t) {
+      const seconds = parseInt(t, 10);
+      if (!isNaN(seconds)) {
+        setTimeout(() => playerRef.current?.seekTo(seconds), 1000);
+      }
+    }
+  }, [searchParams]);
 
   const handleSeek = useCallback((seconds: number) => {
     playerRef.current?.seekTo(seconds);
@@ -126,6 +142,13 @@ export function SessionDetailClient({
           onSeek={handleSeek}
           onMarkerClick={handleMarkerClick}
         />
+
+        {/* Song timeline chips */}
+        {sessionSongs.length > 0 && (
+          <div className="px-5 py-2">
+            <SongTimeline songs={sessionSongs} onSeek={handleSeek} currentTime={currentTime} />
+          </div>
+        )}
 
         {/* Session info */}
         <div className="px-5 pb-3">

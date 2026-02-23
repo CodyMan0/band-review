@@ -7,15 +7,21 @@ import { getDashboardStats, type DashboardStats } from '@/entities/session/actio
 import { getSessions } from '@/entities/session/action/get-sessions';
 import { SessionCard } from '@/entities/session/ui/SessionCard';
 import { type SessionWithCommentCount } from '@/entities/session/model/session.interface';
+import { getSongs } from '@/entities/song/action/get-songs';
+import { type SongWithSessionCount } from '@/entities/song/model/song.interface';
+import { SongCard } from '@/entities/song/ui/SongCard';
 import { deleteSession } from '@/features/delete-session/action/delete-session';
 import { SettingsMenu } from '@/features/inquiry/ui/SettingsMenu';
 import { getProfile } from '@/shared/config/profile';
-import { Button } from '@/shared/ui';
+import { Button, Input } from '@/shared/ui';
 import { CarrotEmpty } from '@/shared/ui/icons';
 
 export function HomeClient() {
   const [sessions, setSessions] = useState<SessionWithCommentCount[]>([]);
   const [stats, setStats] = useState<DashboardStats>({ totalSessions: 0, totalComments: 0, totalPraises: 0 });
+  const [songs, setSongs] = useState<SongWithSessionCount[]>([]);
+  const [activeTab, setActiveTab] = useState<'sessions' | 'songs'>('sessions');
+  const [songSearch, setSongSearch] = useState('');
   const [isLoading, setIsLoading] = useState(true);
   const [deleteTarget, setDeleteTarget] = useState<SessionWithCommentCount | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
@@ -55,9 +61,11 @@ export function HomeClient() {
     Promise.all([
       getSessions(profile.churchId),
       getDashboardStats(profile.churchId),
-    ]).then(([sessionsData, statsData]) => {
+      getSongs(profile.churchId),
+    ]).then(([sessionsData, statsData, songsData]) => {
       setSessions(sessionsData);
       setStats(statsData);
+      setSongs(songsData);
       setIsLoading(false);
     });
   }, []);
@@ -81,7 +89,10 @@ export function HomeClient() {
         </div>
         <div className="mx-5 mb-4 mt-6 h-px bg-border" />
         <div className="flex-1 px-5">
-          <div className="mb-3 h-5 w-16 animate-pulse rounded bg-muted" />
+          <div className="mb-3 flex gap-4">
+            <div className="h-5 w-20 animate-pulse rounded bg-muted" />
+            <div className="h-5 w-16 animate-pulse rounded bg-muted" />
+          </div>
           <div className="flex flex-col gap-2">
             {[1, 2, 3].map((i) => (
               <div key={i} className="h-20 animate-pulse rounded-xl bg-muted" />
@@ -112,19 +123,64 @@ export function HomeClient() {
       <div className="mx-5 mb-4 mt-6 h-px bg-border" />
 
       <div className="flex-1 px-5">
-        <div className="mb-3 flex items-center justify-between">
-          <h2 className="text-base font-bold">예배 목록</h2>
-          <span className="text-xs text-muted-foreground">{sessions.length}개</span>
+        <div className="mb-3 flex w-full border-b border-border/40">
+          <button
+            onClick={() => setActiveTab('sessions')}
+            className={`relative flex-1 py-2.5 text-center text-sm font-medium transition-colors ${
+              activeTab === 'sessions' ? 'text-primary' : 'text-muted-foreground'
+            }`}
+          >
+            예배 {sessions.length}
+            {activeTab === 'sessions' && (
+              <div className="absolute bottom-0 left-1/2 h-[3px] w-12 -translate-x-1/2 rounded-full bg-primary" />
+            )}
+          </button>
+          <button
+            onClick={() => setActiveTab('songs')}
+            className={`relative flex-1 py-2.5 text-center text-sm font-medium transition-colors ${
+              activeTab === 'songs' ? 'text-primary' : 'text-muted-foreground'
+            }`}
+          >
+            곡 {songs.length}
+            {activeTab === 'songs' && (
+              <div className="absolute bottom-0 left-1/2 h-[3px] w-12 -translate-x-1/2 rounded-full bg-primary" />
+            )}
+          </button>
         </div>
 
-        {sessions.length === 0 ? (
-          <EmptyState />
+        {activeTab === 'sessions' ? (
+          sessions.length === 0 ? (
+            <EmptyState />
+          ) : (
+            <div className="flex flex-col gap-2">
+              {sessions.map((session) => (
+                <SessionCard key={session.id} session={session} onDelete={handleDeleteRequest} />
+              ))}
+            </div>
+          )
         ) : (
-          <div className="flex flex-col gap-2">
-            {sessions.map((session) => (
-              <SessionCard key={session.id} session={session} onDelete={handleDeleteRequest} />
-            ))}
-          </div>
+          <>
+            <Input
+              placeholder="곡 검색..."
+              value={songSearch}
+              onChange={(e) => setSongSearch(e.target.value)}
+              className="mb-3 h-10 rounded-xl text-sm"
+            />
+            {songs.filter((s) => s.name.toLowerCase().includes(songSearch.toLowerCase())).length === 0 ? (
+              <div className="flex flex-col items-center py-12">
+                <CarrotEmpty size={56} className="mb-3 opacity-80" />
+                <p className="text-sm font-medium text-muted-foreground">아직 등록된 곡이 없어요</p>
+              </div>
+            ) : (
+              <div className="flex flex-col gap-2">
+                {songs
+                  .filter((s) => s.name.toLowerCase().includes(songSearch.toLowerCase()))
+                  .map((song) => (
+                    <SongCard key={song.id} song={song} />
+                  ))}
+              </div>
+            )}
+          </>
         )}
       </div>
 

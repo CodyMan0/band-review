@@ -2,6 +2,7 @@
 
 import { redirect } from 'next/navigation';
 
+import { saveSessionSongs } from '@/features/create-session-songs/action/save-session-songs';
 import { createClient } from '@/shared/utils/supabase/server';
 
 interface CreateSessionState {
@@ -47,6 +48,19 @@ export async function createSession(
 
   if (error) {
     return { error: '세션 생성에 실패했습니다.' };
+  }
+
+  // Save session songs (optional)
+  const songsJson = formData.get('songs_json') as string | null;
+  if (songsJson) {
+    try {
+      const songs = JSON.parse(songsJson) as { name: string; startTimeSec: number }[];
+      if (Array.isArray(songs) && songs.length > 0) {
+        await saveSessionSongs(data.id, churchId, songs);
+      }
+    } catch {
+      // Ignore malformed songs_json - session was created successfully
+    }
   }
 
   redirect(`/session/${data.id}`);
