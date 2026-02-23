@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@radix-ui/react-label": "^2.1.0",
+    "@radix-ui/react-scroll-area": "^1.2.10",
     "@radix-ui/react-slot": "^1.1.1",
     "@supabase/ssr": "^0.4.0",
     "@supabase/supabase-js": "^2.45.1",
@@ -27,6 +28,7 @@
     "tailwind-merge": "^2.6.0",
     "typescript": "5.3.3",
     "uuid": "^10.0.0",
+    "vaul": "^1.1.2",
     "wavesurfer.js": "^7.12.1"
   },
   "devDependencies": {

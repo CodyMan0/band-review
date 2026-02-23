@@ -1,7 +1,8 @@
 'use client';
 
+import { AnimatePresence, motion } from 'framer-motion';
 import Link from 'next/link';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 
 import { getDashboardStats, type DashboardStats } from '@/entities/session/action/get-dashboard-stats';
 import { getSessions } from '@/entities/session/action/get-sessions';
@@ -13,7 +14,7 @@ import { SongCard } from '@/entities/song/ui/SongCard';
 import { deleteSession } from '@/features/delete-session/action/delete-session';
 import { SettingsMenu } from '@/features/inquiry/ui/SettingsMenu';
 import { getProfile } from '@/shared/config/profile';
-import { Button, Input } from '@/shared/ui';
+import { Button, Input, ScrollArea } from '@/shared/ui';
 import { CarrotEmpty } from '@/shared/ui/icons';
 
 export function HomeClient() {
@@ -26,6 +27,17 @@ export function HomeClient() {
   const [deleteTarget, setDeleteTarget] = useState<SessionWithCommentCount | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState('');
+
+  // Song stats
+  const songStats = useMemo(() => {
+    if (songs.length === 0) return { total: 0, mostPlayed: '-', leastPlayed: '-' };
+    const sorted = [...songs].sort((a, b) => b.session_count - a.session_count);
+    return {
+      total: songs.length,
+      mostPlayed: sorted[0]?.name ?? '-',
+      leastPlayed: sorted[sorted.length - 1]?.name ?? '-',
+    };
+  }, [songs]);
 
   const handleDeleteRequest = (sessionId: string) => {
     const target = sessions.find((s) => s.id === sessionId);
@@ -103,9 +115,13 @@ export function HomeClient() {
     );
   }
 
+  const filteredSongs = songs.filter((s) =>
+    s.name.toLowerCase().includes(songSearch.toLowerCase()),
+  );
+
   return (
-    <div className="flex flex-1 flex-col pb-24 pt-8">
-      <div className="px-5">
+    <div className="flex h-dvh flex-col pt-8">
+      <div className="shrink-0 px-5">
         <div className="flex items-start justify-between">
           <div>
             <h1 className="mt-1 text-[22px] font-bold tracking-tight">대시보드</h1>
@@ -113,16 +129,50 @@ export function HomeClient() {
           <SettingsMenu />
         </div>
 
-        <div className="mt-4 flex flex-wrap gap-2">
-          <StatCard label="총 예배" value={stats.totalSessions} unit="회" />
-          <StatCard label="총 리뷰" value={stats.totalComments} unit="개" />
-          <StatCard label="총 칭찬" value={stats.totalPraises} unit="개" />
+        {/* Dashboard stats — crossfade by tab, no layout shift */}
+        <div className="relative mt-4">
+          {/* Invisible spacer to hold height */}
+          <div className="invisible flex flex-wrap gap-2" aria-hidden="true">
+            <StatCard label="—" value={0} unit="—" />
+            <StatCard label="—" value={0} unit="—" />
+            <StatCard label="—" value={0} unit="—" />
+          </div>
+          <AnimatePresence initial={false}>
+            {activeTab === 'sessions' ? (
+              <motion.div
+                key="session-stats"
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -6 }}
+                transition={{ duration: 0.2, ease: [0.25, 0.46, 0.45, 0.94] }}
+                className="absolute inset-0 flex flex-wrap gap-2"
+              >
+                <StatCard label="총 예배" value={stats.totalSessions} unit="회" />
+                <StatCard label="총 리뷰" value={stats.totalComments} unit="개" />
+                <StatCard label="총 칭찬" value={stats.totalPraises} unit="개" />
+              </motion.div>
+            ) : (
+              <motion.div
+                key="song-stats"
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -6 }}
+                transition={{ duration: 0.2, ease: [0.25, 0.46, 0.45, 0.94] }}
+                className="absolute inset-0 flex flex-wrap gap-2"
+              >
+                <StatCard label="총 곡 수" value={songStats.total} unit="곡" />
+                <StatCardText label="자주 연주한 곡" value={songStats.mostPlayed} />
+                <StatCardText label="적게 연주한 곡" value={songStats.leastPlayed} />
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </div>
 
-      <div className="mx-5 mb-4 mt-6 h-px bg-border" />
+      <div className="mx-5 mb-4 mt-6 shrink-0 h-px bg-border" />
 
-      <div className="flex-1 px-5">
+      <div className="flex min-h-0 flex-1 flex-col px-5 pb-24">
+        {/* Tab switcher */}
         <div className="mb-3 flex w-full border-b border-border/40">
           <button
             onClick={() => setActiveTab('sessions')}
@@ -148,40 +198,59 @@ export function HomeClient() {
           </button>
         </div>
 
-        {activeTab === 'sessions' ? (
-          sessions.length === 0 ? (
-            <EmptyState />
-          ) : (
-            <div className="flex flex-col gap-2">
-              {sessions.map((session) => (
-                <SessionCard key={session.id} session={session} onDelete={handleDeleteRequest} />
-              ))}
-            </div>
-          )
-        ) : (
-          <>
-            <Input
-              placeholder="곡 검색..."
-              value={songSearch}
-              onChange={(e) => setSongSearch(e.target.value)}
-              className="mb-3 h-10 rounded-xl text-sm"
-            />
-            {songs.filter((s) => s.name.toLowerCase().includes(songSearch.toLowerCase())).length === 0 ? (
-              <div className="flex flex-col items-center py-12">
-                <CarrotEmpty size={56} className="mb-3 opacity-80" />
-                <p className="text-sm font-medium text-muted-foreground">아직 등록된 곡이 없어요</p>
-              </div>
+        {/* Tab content with ScrollArea + crossfade */}
+        <ScrollArea className="flex-1">
+          <AnimatePresence mode="wait" initial={false}>
+            {activeTab === 'sessions' ? (
+              <motion.div
+                key="sessions-content"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.15 }}
+                className="pb-2"
+              >
+                {sessions.length === 0 ? (
+                  <EmptyState />
+                ) : (
+                  <div className="flex flex-col gap-2">
+                    {sessions.map((session) => (
+                      <SessionCard key={session.id} session={session} onDelete={handleDeleteRequest} />
+                    ))}
+                  </div>
+                )}
+              </motion.div>
             ) : (
-              <div className="flex flex-col gap-2">
-                {songs
-                  .filter((s) => s.name.toLowerCase().includes(songSearch.toLowerCase()))
-                  .map((song) => (
-                    <SongCard key={song.id} song={song} />
-                  ))}
-              </div>
+              <motion.div
+                key="songs-content"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.15 }}
+                className="pb-2"
+              >
+                <Input
+                  placeholder="곡 검색..."
+                  value={songSearch}
+                  onChange={(e) => setSongSearch(e.target.value)}
+                  className="mb-3 h-10 rounded-xl text-sm"
+                />
+                {filteredSongs.length === 0 ? (
+                  <div className="flex flex-col items-center py-12">
+                    <CarrotEmpty size={56} className="mb-3 opacity-80" />
+                    <p className="text-sm font-medium text-muted-foreground">아직 등록된 곡이 없어요</p>
+                  </div>
+                ) : (
+                  <div className="flex flex-col gap-2">
+                    {filteredSongs.map((song) => (
+                      <SongCard key={song.id} song={song} />
+                    ))}
+                  </div>
+                )}
+              </motion.div>
             )}
-          </>
-        )}
+          </AnimatePresence>
+        </ScrollArea>
       </div>
 
       <Link
@@ -277,6 +346,15 @@ function StatCard({ label, value, unit }: { label: string; value: number | strin
         <span className="text-xl font-bold tracking-tight text-foreground">{value}</span>
         {unit && <span className="text-xs text-muted-foreground">{unit}</span>}
       </div>
+    </div>
+  );
+}
+
+function StatCardText({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="flex min-w-[calc(50%-4px)] flex-1 flex-col rounded-xl border border-border bg-card px-4 py-3">
+      <span className="text-[11px] text-muted-foreground">{label}</span>
+      <p className="mt-1 truncate text-sm font-bold tracking-tight text-foreground">{value}</p>
     </div>
   );
 }
