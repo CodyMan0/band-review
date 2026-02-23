@@ -1,53 +1,51 @@
 'use client';
 
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { type Control, type UseFieldArrayReturn, type UseFormRegister } from 'react-hook-form';
 
 import { searchSongs } from '@/entities/song';
 import { getProfile } from '@/shared/config/profile';
 import { Button, Input } from '@/shared/ui';
 
-interface SongRow {
+interface SongField {
   name: string;
   startTime: string;
 }
 
-interface SongJson {
-  name: string;
-  startTimeSec: number;
+interface FormValues {
+  title: string;
+  date: string;
+  video_url: string;
+  songs: SongField[];
 }
 
-function parseTimeToSeconds(time: string): number {
-  const parts = time.split(':');
-  if (parts.length !== 2) return 0;
-  const minutes = parseInt(parts[0], 10) || 0;
-  const seconds = parseInt(parts[1], 10) || 0;
-  return minutes * 60 + seconds;
+/** Auto-format digits to M:SS. e.g. "554" → "5:54", "1230" → "12:30" */
+function autoFormatTime(raw: string): string {
+  if (raw.includes(':')) return raw;
+  const digits = raw.replace(/\D/g, '');
+  if (digits.length === 0) return '';
+  if (digits.length <= 2) return digits;
+  const secPart = digits.slice(-2);
+  const minPart = digits.slice(0, -2);
+  return `${parseInt(minPart, 10)}:${secPart}`;
 }
 
-function songsToJson(songs: SongRow[]): SongJson[] {
-  return songs
-    .filter((s) => s.name.trim())
-    .map((s) => ({
-      name: s.name.trim(),
-      startTimeSec: parseTimeToSeconds(s.startTime),
-    }));
+interface SongListInputProps {
+  control: Control<FormValues>;
+  register: UseFormRegister<FormValues>;
+  fieldArray: UseFieldArrayReturn<FormValues, 'songs', 'id'>;
+  watchSongs: SongField[];
 }
 
-export function SongListInput() {
+export function SongListInput({ register, fieldArray, watchSongs }: SongListInputProps) {
   const profile = getProfile();
   const churchId = profile?.churchId ?? '';
 
-  const [songs, setSongs] = useState<SongRow[]>([{ name: '', startTime: '' }]);
-  const [autocomplete, setAutocomplete] = useState<{ rowIndex: number; items: string[] } | null>(
-    null,
-  );
+  const { fields, append, remove } = fieldArray;
+
+  const [autocomplete, setAutocomplete] = useState<{ rowIndex: number; items: string[] } | null>(null);
   const debounceTimers = useRef<Record<number, ReturnType<typeof setTimeout>>>({});
   const containerRef = useRef<HTMLDivElement>(null);
-
-  // Update hidden input whenever songs change
-  const getJsonValue = useCallback(() => {
-    return JSON.stringify(songsToJson(songs));
-  }, [songs]);
 
   // Close autocomplete on outside click
   useEffect(() => {
@@ -60,10 +58,7 @@ export function SongListInput() {
     return () => document.removeEventListener('mousedown', handleClick);
   }, []);
 
-  function handleNameChange(index: number, value: string) {
-    setSongs((prev) => prev.map((s, i) => (i === index ? { ...s, name: value } : s)));
-
-    // Clear existing debounce
+  function handleNameInput(index: number, value: string) {
     if (debounceTimers.current[index]) {
       clearTimeout(debounceTimers.current[index]);
     }
@@ -84,86 +79,95 @@ export function SongListInput() {
     }, 300);
   }
 
-  function handleTimeChange(index: number, value: string) {
-    setSongs((prev) => prev.map((s, i) => (i === index ? { ...s, startTime: value } : s)));
-  }
-
-  function handleAutocompleteSelect(index: number, name: string) {
-    setSongs((prev) => prev.map((s, i) => (i === index ? { ...s, name } : s)));
+  function handleAutocompleteSelect(index: number, selectedName: string) {
+    // Programmatically set the field value via native input setter
+    const input = containerRef.current?.querySelector<HTMLInputElement>(`input[name="songs.${index}.name"]`);
+    if (input) {
+      const nativeInputValueSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set;
+      nativeInputValueSetter?.call(input, selectedName);
+      input.dispatchEvent(new Event('input', { bubbles: true }));
+    }
     setAutocomplete(null);
   }
 
-  function addRow() {
-    setSongs((prev) => [...prev, { name: '', startTime: '' }]);
-  }
-
-  function removeRow(index: number) {
-    setSongs((prev) => prev.filter((_, i) => i !== index));
-    setAutocomplete(null);
+  // Per-row validation: highlight partial rows
+  function getRowError(index: number): { name: boolean; time: boolean } {
+    const song = watchSongs[index];
+    if (!song) return { name: false, time: false };
+    const hasName = !!song.name.trim();
+    const hasTime = !!song.startTime.trim();
+    return {
+      name: !hasName && hasTime,
+      time: hasName && !hasTime,
+    };
   }
 
   return (
     <div ref={containerRef} className="flex flex-col gap-2">
-      <input type="hidden" name="songs_json" value={getJsonValue()} />
+      {fields.map((field, index) => {
+        const rowErr = getRowError(index);
+        return (
+          <div key={field.id} className="relative flex items-center gap-2">
+            {/* Song name */}
+            <div className="relative flex-1">
+              <Input
+                {...register(`songs.${index}.name`)}
+                placeholder={`곡명 ${index + 1}`}
+                className={`h-11 rounded-xl text-sm ${rowErr.name ? 'border-destructive ring-1 ring-destructive/30' : ''}`}
+                autoComplete="off"
+                onInput={(e) => handleNameInput(index, (e.target as HTMLInputElement).value)}
+              />
+              {autocomplete?.rowIndex === index && autocomplete.items.length > 0 && (
+                <ul className="absolute left-0 top-full z-50 mt-1 w-full rounded-xl border bg-background shadow-lg">
+                  {autocomplete.items.map((item) => (
+                    <li
+                      key={item}
+                      className="cursor-pointer px-3 py-2 text-sm hover:bg-muted"
+                      onMouseDown={(e) => {
+                        e.preventDefault();
+                        handleAutocompleteSelect(index, item);
+                      }}
+                    >
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              )}
+            </div>
 
-      {songs.map((song, index) => (
-        <div key={index} className="relative flex items-center gap-2">
-          {/* Song name input with autocomplete */}
-          <div className="relative flex-1">
+            {/* Start time */}
             <Input
-              value={song.name}
-              onChange={(e) => handleNameChange(index, e.target.value)}
-              placeholder="곡명"
-              className="h-11 rounded-xl text-sm"
-              autoComplete="off"
-              onFocus={() => {
-                if (song.name.trim() && autocomplete?.rowIndex !== index) {
-                  handleNameChange(index, song.name);
-                }
-              }}
+              {...register(`songs.${index}.startTime`, {
+                onChange: (e) => {
+                  e.target.value = autoFormatTime(e.target.value);
+                },
+              })}
+              placeholder="0:00"
+              inputMode="numeric"
+              className={`h-11 w-24 rounded-xl text-sm ${rowErr.time ? 'border-destructive ring-1 ring-destructive/30' : ''}`}
             />
-            {autocomplete?.rowIndex === index && autocomplete.items.length > 0 && (
-              <ul className="absolute left-0 top-full z-50 mt-1 w-full rounded-xl border bg-background shadow-lg">
-                {autocomplete.items.map((item) => (
-                  <li
-                    key={item}
-                    className="cursor-pointer px-3 py-2 text-sm hover:bg-muted"
-                    onMouseDown={(e) => {
-                      e.preventDefault();
-                      handleAutocompleteSelect(index, item);
-                    }}
-                  >
-                    {item}
-                  </li>
-                ))}
-              </ul>
-            )}
+
+            {/* Remove */}
+            <button
+              type="button"
+              onClick={() => {
+                if (fields.length <= 1) return;
+                remove(index);
+                setAutocomplete(null);
+              }}
+              className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-muted-foreground hover:bg-muted hover:text-foreground"
+              aria-label="삭제"
+            >
+              ✕
+            </button>
           </div>
-
-          {/* Start time input */}
-          <Input
-            value={song.startTime}
-            onChange={(e) => handleTimeChange(index, e.target.value)}
-            placeholder="0:00"
-            className="h-11 w-24 rounded-xl text-sm"
-          />
-
-          {/* Remove button */}
-          <button
-            type="button"
-            onClick={() => removeRow(index)}
-            className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl text-muted-foreground hover:bg-muted hover:text-foreground"
-            aria-label="삭제"
-          >
-            ✕
-          </button>
-        </div>
-      ))}
+        );
+      })}
 
       <Button
         type="button"
         variant="outline"
-        onClick={addRow}
+        onClick={() => append({ name: '', startTime: '' })}
         className="h-11 w-full rounded-xl text-sm"
       >
         + 곡 추가

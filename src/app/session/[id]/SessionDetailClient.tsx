@@ -143,6 +143,15 @@ export function SessionDetailClient({
           onMarkerClick={handleMarkerClick}
         />
 
+        {/* Sync hint banner */}
+        <div className="flex items-center justify-center gap-1.5 bg-muted/50 px-4 py-1.5">
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className="text-muted-foreground">
+            <path d="M1.5 6A4.5 4.5 0 0 1 9.17 3M10.5 6A4.5 4.5 0 0 1 2.83 9" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
+            <path d="M8 1.5L9.17 3 7.5 3.8M4 10.5L2.83 9l1.67-.8" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+          <span className="text-[11px] text-muted-foreground">시간이 안 맞나요? 새로고침해보세요</span>
+        </div>
+
         {/* Session info */}
         <div className="px-5 pt-3 pb-2">
           <h1 className="text-base font-bold leading-snug">{session.title}</h1>
