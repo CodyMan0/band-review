@@ -14,7 +14,7 @@ interface CommentFormProps {
   sessionId: string;
   currentTime: number;
   parentId?: string | null;
-  onSubmitted?: () => void;
+  onSubmitted?: (data?: Record<string, unknown>) => void;
   onCancel?: () => void;
 }
 
@@ -82,7 +82,7 @@ export function CommentForm({
     }
 
     setContent("");
-    onSubmitted?.();
+    onSubmitted?.(result.data);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {

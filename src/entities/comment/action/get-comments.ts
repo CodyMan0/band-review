@@ -11,7 +11,7 @@ export async function getComments(sessionId: string): Promise<CommentWithReplies
     .from('comments')
     .select('*')
     .eq('session_id', sessionId)
-    .order('timestamp_sec', { ascending: true });
+    .order('created_at', { ascending: false });
 
   if (error || !data) return [];
 

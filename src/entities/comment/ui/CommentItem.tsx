@@ -4,7 +4,8 @@ import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
 
 import { getPartConfig } from "@/shared/config/parts";
-import { formatTimestamp } from "@/shared/lib/format-time";
+import { formatRelativeTime, formatTimestamp } from "@/shared/lib/format-time";
+import { SwipeToDelete } from "@/shared/ui";
 import { PartIcon } from "@/shared/ui/icons";
 
 import { type CommentWithReplies } from "../model/comment.interface";
@@ -13,17 +14,19 @@ interface CommentItemProps {
   comment: CommentWithReplies;
   onSeek: (seconds: number) => void;
   onReply: (commentId: string) => void;
+  onDelete?: (commentId: string) => void;
+  isOwn?: boolean;
   isHighlighted?: boolean;
 }
 
-export function CommentItem({ comment, onSeek, onReply, isHighlighted }: CommentItemProps) {
+export function CommentItem({ comment, onSeek, onReply, onDelete, isOwn, isHighlighted }: CommentItemProps) {
   const partConfig = getPartConfig(comment.author_part);
   const [repliesOpen, setRepliesOpen] = useState(false);
 
-  return (
+  const content = (
     <div
       id={`item-${comment.id}`}
-      className={`flex flex-col gap-3 border-b border-border/60 py-2 last:border-b-0 rounded-lg ${isHighlighted ? "flash-highlight" : ""}`}
+      className={`flex flex-col gap-3 border-b border-border/60 py-2 last:border-b-0 ${isHighlighted ? "flash-highlight rounded-lg" : ""}`}
     >
       {/* Main comment */}
       <div className="flex items-start gap-3">
@@ -58,6 +61,11 @@ export function CommentItem({ comment, onSeek, onReply, isHighlighted }: Comment
               </svg>
               {formatTimestamp(comment.timestamp_sec)}
             </button>
+            {comment.created_at && (
+              <span className="text-[11px] text-muted-foreground/60">
+                {formatRelativeTime(comment.created_at)}
+              </span>
+            )}
           </div>
 
           {/* Comment text */}
@@ -154,5 +162,13 @@ export function CommentItem({ comment, onSeek, onReply, isHighlighted }: Comment
         )}
       </AnimatePresence>
     </div>
+  );
+
+  if (!onDelete) return content;
+
+  return (
+    <SwipeToDelete onDelete={() => onDelete(comment.id)} enabled={!!isOwn}>
+      {content}
+    </SwipeToDelete>
   );
 }

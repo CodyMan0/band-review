@@ -1,6 +1,6 @@
 'use client';
 
-import { useActionState } from 'react';
+import { useActionState, useCallback, useState } from 'react';
 import { useFieldArray, useForm, useWatch } from 'react-hook-form';
 
 import { createSession } from '@/features/create-session/action/create-session';
@@ -93,8 +93,7 @@ export function CreateSessionForm() {
 
       {/* YouTube URL */}
       <div className="flex flex-col gap-1.5">
-        <label htmlFor="video_url" className="text-sm font-medium">YouTube 링크</label>
-        <p className="text-xs text-muted-foreground">일부 공개(Unlisted) 영상도 사용 가능해요</p>
+        <YouTubeLabelWithHelp />
         <Input
           id="video_url"
           {...register('video_url', { required: true })}
@@ -138,5 +137,37 @@ export function CreateSessionForm() {
         {isPending ? '만드는 중...' : '세션 만들기'}
       </Button>
     </form>
+  );
+}
+
+function YouTubeLabelWithHelp() {
+  const [open, setOpen] = useState(false);
+  const toggle = useCallback(() => setOpen((v) => !v), []);
+
+  return (
+    <div>
+      <div className="flex items-center gap-1.5">
+        <label htmlFor="video_url" className="text-sm font-medium">YouTube 링크</label>
+        <button
+          type="button"
+          onClick={toggle}
+          className="flex h-[18px] w-[18px] items-center justify-center rounded-full bg-muted text-muted-foreground transition-colors hover:bg-muted-foreground/20"
+          aria-label="도움말"
+        >
+          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
+            <path d="M4.5 4.5C4.5 3.67 5.17 3 6 3C6.83 3 7.5 3.67 7.5 4.5C7.5 5.17 7.03 5.5 6.5 5.75C6.22 5.89 6 6.1 6 6.4V6.75" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
+            <circle cx="6" cy="8.5" r="0.6" fill="currentColor" />
+          </svg>
+        </button>
+      </div>
+      {open && (
+        <div className="mt-1.5 rounded-lg bg-muted/70 px-3 py-2.5 text-xs leading-relaxed text-muted-foreground">
+          본당 예배 영상을 YouTube에 <strong className="text-foreground/80">일부 공개(Unlisted)</strong>로 업로드한 뒤 링크를 붙여넣어 주세요. 서버 용량 문제로 직접 업로드 대신 YouTube를 활용하고 있어요.
+        </div>
+      )}
+      {!open && (
+        <p className="mt-0.5 text-xs text-muted-foreground">일부 공개(Unlisted) 영상도 사용 가능해요</p>
+      )}
+    </div>
   );
 }

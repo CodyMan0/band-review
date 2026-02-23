@@ -12,7 +12,7 @@ import { CarrotClap, PartIcon } from "@/shared/ui/icons";
 interface PraiseFormProps {
   sessionId: string;
   currentTime: number;
-  onSubmitted?: () => void;
+  onSubmitted?: (data?: Record<string, unknown>) => void;
   onCancel: () => void;
 }
 
@@ -56,7 +56,7 @@ export function PraiseForm({
 
     setContent("");
     setTargetPart(null);
-    onSubmitted?.();
+    onSubmitted?.(result.data);
   };
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {

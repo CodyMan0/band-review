@@ -7,4 +7,5 @@ export { Label } from "./label";
 export { Logo } from "./Logo";
 export { ScrollArea, ScrollBar } from "./scroll-area";
 export { Skeleton } from "./skeleton";
+export { SwipeToDelete } from "./swipe-to-delete";
 export * from "./icons";

@@ -11,6 +11,8 @@ interface CommentListProps {
   filterPart: Part | "all";
   onSeek: (seconds: number) => void;
   onReply: (commentId: string) => void;
+  onDelete?: (commentId: string) => void;
+  currentUserName?: string;
   highlightedId?: string | null;
 }
 
@@ -19,6 +21,8 @@ export function CommentList({
   filterPart,
   onSeek,
   onReply,
+  onDelete,
+  currentUserName,
   highlightedId,
 }: CommentListProps) {
   const filtered =
@@ -56,15 +60,20 @@ export function CommentList({
 
   return (
     <div className="flex flex-col">
-      {filtered.map((comment) => (
-        <CommentItem
-          key={comment.id}
-          comment={comment}
-          onSeek={onSeek}
-          onReply={onReply}
-          isHighlighted={highlightedId === comment.id}
-        />
-      ))}
+      {filtered.map((comment) => {
+        const isOwn = !!currentUserName && comment.author_name === currentUserName;
+        return (
+          <CommentItem
+            key={comment.id}
+            comment={comment}
+            onSeek={onSeek}
+            onReply={onReply}
+            onDelete={isOwn ? onDelete : undefined}
+            isOwn={isOwn}
+            isHighlighted={highlightedId === comment.id}
+          />
+        );
+      })}
     </div>
   );
 }

@@ -10,7 +10,7 @@ export async function getPraises(sessionId: string): Promise<Praise[]> {
     .from('praises')
     .select('*')
     .eq('session_id', sessionId)
-    .order('timestamp_sec', { ascending: true });
+    .order('created_at', { ascending: false });
 
   if (error || !data) return [];
 

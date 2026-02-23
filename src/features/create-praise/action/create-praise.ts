@@ -13,7 +13,7 @@ interface CreatePraiseInput {
   content: string;
 }
 
-export async function createPraise(input: CreatePraiseInput): Promise<{ error?: string }> {
+export async function createPraise(input: CreatePraiseInput): Promise<{ error?: string; data?: Record<string, unknown> }> {
   const { session_id, timestamp_sec, author_name, author_part, target_part, content } = input;
 
   if (!content.trim()) {
@@ -22,19 +22,19 @@ export async function createPraise(input: CreatePraiseInput): Promise<{ error?: 
 
   const supabase = await createClient();
 
-  const { error } = await supabase.from('praises').insert({
+  const { data, error } = await supabase.from('praises').insert({
     session_id,
     timestamp_sec,
     author_name,
     author_part,
     target_part,
     content: content.trim(),
-  });
+  }).select().single();
 
   if (error) {
     return { error: '칭찬 등록에 실패했습니다.' };
   }
 
   revalidatePath(`/session/${session_id}`);
-  return {};
+  return { data };
 }

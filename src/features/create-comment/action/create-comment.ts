@@ -13,7 +13,7 @@ interface CreateCommentInput {
   content: string;
 }
 
-export async function createComment(input: CreateCommentInput): Promise<{ error?: string }> {
+export async function createComment(input: CreateCommentInput): Promise<{ error?: string; data?: Record<string, unknown> }> {
   const { session_id, parent_id, timestamp_sec, author_name, author_part, content } = input;
 
   if (!content.trim()) {
@@ -22,19 +22,19 @@ export async function createComment(input: CreateCommentInput): Promise<{ error?
 
   const supabase = await createClient();
 
-  const { error } = await supabase.from('comments').insert({
+  const { data, error } = await supabase.from('comments').insert({
     session_id,
     parent_id: parent_id || null,
     timestamp_sec,
     author_name,
     author_part,
     content,
-  });
+  }).select().single();
 
   if (error) {
     return { error: '코멘트 작성에 실패했습니다.' };
   }
 
   revalidatePath(`/session/${session_id}`);
-  return {};
+  return { data };
 }
