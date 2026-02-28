@@ -9,25 +9,14 @@ export async function getSongs(churchId: string): Promise<SongWithSessionCount[]
 
   const { data: songs, error } = await supabase
     .from('songs')
-    .select('*')
+    .select('*, session_songs(count)')
     .eq('church_id', churchId)
     .order('name', { ascending: true });
 
   if (error || !songs) return [];
 
-  const songsWithCounts: SongWithSessionCount[] = await Promise.all(
-    songs.map(async (song) => {
-      const { count: sessionCount } = await supabase
-        .from('session_songs')
-        .select('*', { count: 'exact', head: true })
-        .eq('song_id', song.id);
-
-      return {
-        ...song,
-        session_count: sessionCount ?? 0,
-      };
-    }),
-  );
-
-  return songsWithCounts;
+  return songs.map((song) => ({
+    ...song,
+    session_count: (song.session_songs as unknown as { count: number }[])?.[0]?.count ?? 0,
+  }));
 }

@@ -4,7 +4,6 @@ import { AnimatePresence, motion } from 'framer-motion';
 import Link from 'next/link';
 import { useEffect, useMemo, useState } from 'react';
 
-import { getDashboardStats, type DashboardStats } from '@/entities/session/action/get-dashboard-stats';
 import { getSessions } from '@/entities/session/action/get-sessions';
 import { SessionCard } from '@/entities/session/ui/SessionCard';
 import { type SessionWithCommentCount } from '@/entities/session/model/session.interface';
@@ -18,13 +17,28 @@ import { getProfile } from '@/shared/config/profile';
 import { BottomSheet, Button, Input, ScrollArea } from '@/shared/ui';
 import { CarrotEmpty } from '@/shared/ui/icons';
 
+// Simple client-side cache to avoid re-fetching on back navigation
+let cachedData: {
+  churchId: string;
+  sessions: SessionWithCommentCount[];
+  songs: SongWithSessionCount[];
+  ts: number;
+} | null = null;
+const CACHE_TTL = 60_000; // 1 minute
+
 export function HomeClient() {
   const [sessions, setSessions] = useState<SessionWithCommentCount[]>([]);
-  const [stats, setStats] = useState<DashboardStats>({ totalSessions: 0, totalComments: 0, totalPraises: 0 });
   const [songs, setSongs] = useState<SongWithSessionCount[]>([]);
   const [activeTab, setActiveTab] = useState<'sessions' | 'songs'>('sessions');
   const [songSearch, setSongSearch] = useState('');
   const [isLoading, setIsLoading] = useState(true);
+
+  // Derive dashboard stats from sessions data (no extra query needed)
+  const stats = useMemo(() => ({
+    totalSessions: sessions.length,
+    totalComments: sessions.reduce((sum, s) => sum + s.comment_count, 0),
+    totalPraises: sessions.reduce((sum, s) => sum + s.praise_count, 0),
+  }), [sessions]);
   const [deleteTarget, setDeleteTarget] = useState<SessionWithCommentCount | null>(null);
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState('');
@@ -61,7 +75,11 @@ export function HomeClient() {
       setDeleteError(result.error);
       return;
     }
-    setSessions((prev) => prev.filter((s) => s.id !== deleteTarget.id));
+    setSessions((prev) => {
+      const next = prev.filter((s) => s.id !== deleteTarget.id);
+      if (cachedData) cachedData = { ...cachedData, sessions: next, ts: Date.now() };
+      return next;
+    });
     setDeleteTarget(null);
   };
 
@@ -88,7 +106,11 @@ export function HomeClient() {
       setSongDeleteError(result.error);
       return;
     }
-    setSongs((prev) => prev.filter((s) => s.id !== songDeleteTarget.id));
+    setSongs((prev) => {
+      const next = prev.filter((s) => s.id !== songDeleteTarget.id);
+      if (cachedData) cachedData = { ...cachedData, songs: next, ts: Date.now() };
+      return next;
+    });
     setSongDeleteTarget(null);
   };
 
@@ -101,14 +123,21 @@ export function HomeClient() {
     const profile = getProfile();
     if (!profile) return;
 
+    // Use cache if fresh (avoids re-fetch on back navigation)
+    if (cachedData && cachedData.churchId === profile.churchId && Date.now() - cachedData.ts < CACHE_TTL) {
+      setSessions(cachedData.sessions);
+      setSongs(cachedData.songs);
+      setIsLoading(false);
+      return;
+    }
+
     Promise.all([
       getSessions(profile.churchId),
-      getDashboardStats(profile.churchId),
       getSongs(profile.churchId),
-    ]).then(([sessionsData, statsData, songsData]) => {
+    ]).then(([sessionsData, songsData]) => {
       setSessions(sessionsData);
-      setStats(statsData);
       setSongs(songsData);
+      cachedData = { churchId: profile.churchId, sessions: sessionsData, songs: songsData, ts: Date.now() };
       setIsLoading(false);
     });
   }, []);

@@ -9,32 +9,15 @@ export async function getSessions(churchId: string): Promise<SessionWithCommentC
 
   const { data: sessions, error } = await supabase
     .from('sessions')
-    .select('*')
+    .select('*, comments(count), praises(count)')
     .eq('church_id', churchId)
     .order('date', { ascending: false });
 
   if (error || !sessions) return [];
 
-  const sessionsWithCounts: SessionWithCommentCount[] = await Promise.all(
-    sessions.map(async (session) => {
-      const [{ count: commentCount }, { count: praiseCount }] = await Promise.all([
-        supabase
-          .from('comments')
-          .select('*', { count: 'exact', head: true })
-          .eq('session_id', session.id),
-        supabase
-          .from('praises')
-          .select('*', { count: 'exact', head: true })
-          .eq('session_id', session.id),
-      ]);
-
-      return {
-        ...session,
-        comment_count: commentCount ?? 0,
-        praise_count: praiseCount ?? 0,
-      };
-    }),
-  );
-
-  return sessionsWithCounts;
+  return sessions.map((session) => ({
+    ...session,
+    comment_count: (session.comments as unknown as { count: number }[])?.[0]?.count ?? 0,
+    praise_count: (session.praises as unknown as { count: number }[])?.[0]?.count ?? 0,
+  }));
 }
