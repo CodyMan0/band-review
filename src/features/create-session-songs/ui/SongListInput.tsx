@@ -19,10 +19,10 @@ interface FormValues {
   songs: SongField[];
 }
 
-/** Auto-format digits to M:SS. e.g. "554" → "5:54", "1230" → "12:30" */
+/** Auto-format digits to MM:SS. Max 4 digits. e.g. "554" → "5:54", "1242" → "12:42" */
 function autoFormatTime(raw: string): string {
-  if (raw.includes(':')) return raw;
-  const digits = raw.replace(/\D/g, '');
+  // Strip everything except digits
+  const digits = raw.replace(/\D/g, '').slice(0, 4);
   if (digits.length === 0) return '';
   if (digits.length <= 2) return digits;
   const secPart = digits.slice(-2);
@@ -144,6 +144,7 @@ export function SongListInput({ register, fieldArray, watchSongs }: SongListInpu
               })}
               placeholder="0:00"
               inputMode="numeric"
+              maxLength={5}
               className={`h-11 w-24 rounded-xl text-sm ${rowErr.time ? 'border-destructive ring-1 ring-destructive/30' : ''}`}
             />
 

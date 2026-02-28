@@ -1,6 +1,6 @@
 'use client';
 
-import { useActionState, useCallback, useState } from 'react';
+import { useCallback, useState, useTransition } from 'react';
 import { useFieldArray, useForm, useWatch } from 'react-hook-form';
 
 import { createSession } from '@/features/create-session/action/create-session';
@@ -29,10 +29,11 @@ function parseTimeToSeconds(time: string): number {
 }
 
 export function CreateSessionForm() {
-  const [state, formAction, isPending] = useActionState(createSession, {});
   const profile = getProfile();
+  const [error, setError] = useState('');
+  const [isPending, startTransition] = useTransition();
 
-  const { register, control, formState: { errors } } = useForm<FormValues>({
+  const { register, control, handleSubmit } = useForm<FormValues>({
     defaultValues: {
       title: '',
       date: new Date().toISOString().split('T')[0],
@@ -44,14 +45,11 @@ export function CreateSessionForm() {
 
   const fieldArray = useFieldArray({ control, name: 'songs' });
 
-  // Watch all fields for submit button state
   const watchTitle = useWatch({ control, name: 'title' });
   const watchUrl = useWatch({ control, name: 'video_url' });
   const watchSongs = useWatch({ control, name: 'songs' });
 
-  // Check if at least one song row is fully filled
   const hasValidSong = watchSongs.some((s) => s.name.trim() && s.startTime.trim());
-  // Check no partial rows (one filled, other empty)
   const hasPartialRow = watchSongs.some((s) => {
     const hasName = !!s.name.trim();
     const hasTime = !!s.startTime.trim();
@@ -60,15 +58,32 @@ export function CreateSessionForm() {
 
   const isFormReady = !!watchTitle?.trim() && !!watchUrl?.trim() && hasValidSong && !hasPartialRow;
 
-  // Build songs JSON for the hidden input
-  const songsJson = JSON.stringify(
-    watchSongs
-      .filter((s) => s.name.trim() && s.startTime.trim())
-      .map((s) => ({ name: s.name.trim(), startTimeSec: parseTimeToSeconds(s.startTime) }))
-  );
+  const onSubmit = handleSubmit((data) => {
+    setError('');
+    const formData = new FormData();
+    formData.set('title', data.title);
+    formData.set('date', data.date);
+    formData.set('video_url', data.video_url);
+    formData.set('video_type', 'youtube');
+    formData.set('church_id', profile?.churchId ?? '');
+    formData.set('created_by', profile?.name ?? '');
+    formData.set('songs_json', JSON.stringify(
+      data.songs
+        .filter((s) => s.name.trim() && s.startTime.trim())
+        .map((s) => ({ name: s.name.trim(), startTimeSec: parseTimeToSeconds(s.startTime) }))
+    ));
+
+    startTransition(async () => {
+      const result = await createSession({}, formData);
+      if (result.error) {
+        setError(result.error);
+      }
+      // On success, createSession calls redirect() — form state preserved until navigation
+    });
+  });
 
   return (
-    <form action={formAction} className="flex flex-col gap-6">
+    <form onSubmit={onSubmit} className="flex flex-col gap-6">
       {/* Title */}
       <div className="flex flex-col gap-1.5">
         <label htmlFor="title" className="text-sm font-medium">예배 이름</label>
@@ -115,16 +130,10 @@ export function CreateSessionForm() {
         />
       </div>
 
-      {/* Hidden fields for server action */}
-      <input type="hidden" name="video_type" value="youtube" />
-      <input type="hidden" name="church_id" value={profile?.churchId ?? ''} />
-      <input type="hidden" name="created_by" value={profile?.name ?? ''} />
-      <input type="hidden" name="songs_json" value={songsJson} />
-
       {/* Error */}
-      {state.error && (
+      {error && (
         <p className="rounded-xl bg-destructive/5 px-4 py-3 text-sm text-destructive">
-          {state.error}
+          {error}
         </p>
       )}
 
