@@ -3,6 +3,7 @@
 import { useState } from "react";
 
 import { createInquiry } from "@/features/inquiry/action/create-inquiry";
+import { resetOnboarding } from "@/shared/config/onboarding";
 import { getProfile } from "@/shared/config/profile";
 import { BottomSheet, Button, Input } from "@/shared/ui";
 import { CarrotCheck } from "@/shared/ui/icons";
@@ -112,6 +113,38 @@ export function SettingsMenu() {
                     <p className="text-sm font-medium">문의하기</p>
                     <p className="text-xs text-muted-foreground">
                       건의사항이나 궁금한 점을 남겨주세요
+                    </p>
+                  </div>
+                </button>
+                <button
+                  onClick={() => {
+                    resetOnboarding();
+                    window.location.reload();
+                  }}
+                  className="flex items-center gap-3 rounded-xl px-3 py-3 text-left transition-colors hover:bg-muted active:bg-muted/70"
+                >
+                  <span className="flex h-9 w-9 items-center justify-center rounded-full bg-primary/10 text-primary">
+                    <svg
+                      width="18"
+                      height="18"
+                      viewBox="0 0 18 18"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
+                      <circle cx="9" cy="9" r="7" />
+                      <path d="M9 6v1.5" />
+                      <circle cx="9" cy="9" r="0.5" fill="currentColor" stroke="none" />
+                      <path d="M9 12v-1" />
+                      <path d="M7 12h4" />
+                    </svg>
+                  </span>
+                  <div>
+                    <p className="text-sm font-medium">사용법 다시 보기</p>
+                    <p className="text-xs text-muted-foreground">
+                      온보딩 가이드를 다시 확인해요
                     </p>
                   </div>
                 </button>
