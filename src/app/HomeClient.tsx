@@ -13,6 +13,8 @@ import { SongCard } from '@/entities/song/ui/SongCard';
 import { deleteSession } from '@/features/delete-session/action/delete-session';
 import { deleteSong } from '@/features/delete-song/action/delete-song';
 import { SettingsMenu } from '@/features/inquiry/ui/SettingsMenu';
+import { GuidedTour } from '@/features/onboarding';
+import { isGuideSeen, markGuideSeen } from '@/shared/config/onboarding';
 import { getProfile } from '@/shared/config/profile';
 import { BottomSheet, Button, Input, ScrollArea } from '@/shared/ui';
 import { CarrotEmpty } from '@/shared/ui/icons';
@@ -32,6 +34,7 @@ export function HomeClient() {
   const [activeTab, setActiveTab] = useState<'sessions' | 'songs'>('sessions');
   const [songSearch, setSongSearch] = useState('');
   const [isLoading, setIsLoading] = useState(true);
+  const [showGuide, setShowGuide] = useState(false);
 
   // Derive dashboard stats from sessions data (no extra query needed)
   const stats = useMemo(() => ({
@@ -139,6 +142,7 @@ export function HomeClient() {
       setSongs(songsData);
       cachedData = { churchId: profile.churchId, sessions: sessionsData, songs: songsData, ts: Date.now() };
       setIsLoading(false);
+      if (!isGuideSeen()) setShowGuide(true);
     });
   }, []);
 
@@ -190,7 +194,7 @@ export function HomeClient() {
         </div>
 
         {/* Dashboard stats — crossfade by tab, no layout shift */}
-        <div className="relative mt-4">
+        <div className="relative mt-4" data-tour="stats">
           {/* Invisible spacer to hold height */}
           <div className="invisible flex flex-wrap gap-2" aria-hidden="true">
             <StatCard label="—" value={0} unit="—" />
@@ -233,7 +237,7 @@ export function HomeClient() {
 
       <div className="flex min-h-0 flex-1 flex-col pb-24">
         {/* Tab switcher */}
-        <div className="mb-3 flex w-full border-b border-border/40 px-5">
+        <div className="mb-3 flex w-full border-b border-border/40 px-5" data-tour="tabs">
           <button
             onClick={() => setActiveTab('sessions')}
             className={`relative flex-1 py-2.5 text-center text-sm font-medium transition-colors ${
@@ -317,6 +321,7 @@ export function HomeClient() {
 
       <Link
         href="/session/new"
+        data-tour="fab"
         className="fixed right-4 z-30 sm:right-1/2 sm:translate-x-[calc(min(270px,50vw)-8px)]"
         style={{ bottom: 'calc(24px + var(--safe-area-bottom))' }}
       >
@@ -432,6 +437,15 @@ export function HomeClient() {
           </Button>
         </div>
       </BottomSheet>
+
+      {showGuide && (
+        <GuidedTour
+          onComplete={() => {
+            markGuideSeen();
+            setShowGuide(false);
+          }}
+        />
+      )}
     </div>
   );
 }

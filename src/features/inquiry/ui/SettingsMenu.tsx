@@ -67,6 +67,7 @@ export function SettingsMenu() {
       {/* Settings gear icon */}
       <button
         onClick={handleOpenMenu}
+        data-tour="settings"
         className="flex h-9 w-9 items-center justify-center rounded-full text-muted-foreground transition-colors hover:bg-muted hover:text-foreground active:scale-95"
         aria-label="설정"
       >
