@@ -19,7 +19,7 @@ export function BottomSheet({ open, onOpenChange, children, className }: BottomS
         <Drawer.Overlay className="fixed inset-0 z-50 bg-black/30" />
         <Drawer.Content
           className={cn(
-            'fixed inset-x-0 bottom-0 z-50 mx-auto flex max-w-[540px] flex-col rounded-t-2xl bg-background px-5 pb-8 pt-5 shadow-xl outline-none',
+            'fixed inset-x-0 bottom-0 z-50 mx-auto flex max-w-[540px] flex-col rounded-t-2xl bg-background px-5 pt-5 shadow-xl outline-none',
             className,
           )}
         >
@@ -28,6 +28,7 @@ export function BottomSheet({ open, onOpenChange, children, className }: BottomS
           </VisuallyHidden.Root>
           <Drawer.Handle className="mx-auto mb-4 h-1 w-10 rounded-full bg-border" />
           {children}
+          <div style={{ height: 'calc(32px + var(--safe-area-bottom))' }} />
         </Drawer.Content>
       </Drawer.Portal>
     </Drawer.Root>

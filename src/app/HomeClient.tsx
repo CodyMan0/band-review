@@ -288,7 +288,8 @@ export function HomeClient() {
 
       <Link
         href="/session/new"
-        className="fixed bottom-6 right-4 z-30 sm:right-1/2 sm:translate-x-[calc(min(270px,50vw)-8px)]"
+        className="fixed right-4 z-30 sm:right-1/2 sm:translate-x-[calc(min(270px,50vw)-8px)]"
+        style={{ bottom: 'calc(24px + var(--safe-area-bottom))' }}
       >
         <Button className="h-12 w-12 rounded-full p-0 shadow-lg active:scale-95">
           <svg width="20" height="20" viewBox="0 0 20 20" fill="none">

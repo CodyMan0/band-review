@@ -91,6 +91,11 @@
     font-size: 16px;
   }
 
+  /* Safe area CSS env variables */
+  :root {
+    --safe-area-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
   body {
     @apply bg-background text-foreground;
     -webkit-tap-highlight-color: transparent;

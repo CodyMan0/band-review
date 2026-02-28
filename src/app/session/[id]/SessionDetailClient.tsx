@@ -335,7 +335,7 @@ export function SessionDetailClient({
 
       {/* Fixed bottom comment input */}
       {!replyTo && !isPraiseMode && (
-        <div className="fixed inset-x-0 bottom-0 z-30 border-t border-border/60 bg-background/95 backdrop-blur-md">
+        <div className="fixed inset-x-0 bottom-0 z-30 border-t border-border/60 bg-background/95 backdrop-blur-md" style={{ paddingBottom: 'var(--safe-area-bottom)' }}>
           <div className="mx-auto flex w-full max-w-[540px] items-center gap-2 px-4 py-2.5">
             <div className="flex-1">
               <CommentForm
@@ -359,7 +359,7 @@ export function SessionDetailClient({
       {isPraiseMode && !replyTo && (
         <div
           className="fixed inset-x-0 bottom-0 z-30 border-t border-amber-200/60 bg-amber-50/95 backdrop-blur-md"
-          style={{ animation: "slideUp 0.18s ease-out" }}
+          style={{ animation: "slideUp 0.18s ease-out", paddingBottom: 'var(--safe-area-bottom)' }}
         >
           <div className="mx-auto w-full max-w-[540px] px-4 py-2.5">
             <PraiseForm
@@ -440,7 +440,7 @@ export function SessionDetailClient({
       {replyTo && (
         <div
           className="fixed inset-x-0 bottom-0 z-40 border-t border-border/60 bg-background/95 shadow-lg backdrop-blur-md"
-          style={{ animation: "slideUp 0.18s ease-out" }}
+          style={{ animation: "slideUp 0.18s ease-out", paddingBottom: 'var(--safe-area-bottom)' }}
         >
           <div className="mx-auto w-full max-w-[540px] px-4 py-2.5">
             <div className="mb-2 flex items-center justify-between">
