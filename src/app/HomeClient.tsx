@@ -179,9 +179,9 @@ export function HomeClient() {
     );
   }
 
-  const filteredSongs = songs.filter((s) =>
-    s.name.toLowerCase().includes(songSearch.toLowerCase()),
-  );
+  const filteredSongs = songs
+    .filter((s) => s.name.toLowerCase().includes(songSearch.toLowerCase()))
+    .sort((a, b) => b.session_count - a.session_count);
 
   return (
     <div className="flex h-dvh flex-col pt-8">
