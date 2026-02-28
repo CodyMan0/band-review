@@ -23,7 +23,7 @@ import { getProfile } from "@/shared/config/profile";
 import { type SessionSongWithName } from "@/entities/song/model/song.interface";
 import { SongTimeline } from "@/entities/song/ui/SongTimeline";
 import { type Part, PARTS } from "@/shared/config/parts";
-import { BottomSheet, Button, ScrollArea } from "@/shared/ui";
+import { BottomSheet, Button } from "@/shared/ui";
 import { CarrotClap, PartIcon } from "@/shared/ui/icons";
 
 interface Props {
@@ -180,9 +180,9 @@ export function SessionDetailClient({
 
   return (
     <ProfileProvider>
-      <div className="flex h-dvh flex-col overflow-x-hidden">
+      <div className="flex min-h-dvh flex-col overflow-x-hidden">
         {/* Back button */}
-        <div className="shrink-0 px-2 py-3">
+        <div className="px-2 py-3">
           <Link
             href="/"
             className="inline-flex items-center gap-1 text-sm text-muted-foreground active:opacity-60"
@@ -201,7 +201,7 @@ export function SessionDetailClient({
         </div>
 
         {/* Video — edge to edge, no border */}
-        <div className="relative shrink-0">
+        <div className="relative">
           <VideoPlayer
             ref={playerRef}
             videoUrl={session.video_url}
@@ -214,7 +214,7 @@ export function SessionDetailClient({
         </div>
 
         {/* Timeline markers */}
-        <div className="shrink-0">
+        <div>
           <TimelineMarkers
             comments={comments}
             praises={praises}
@@ -226,7 +226,7 @@ export function SessionDetailClient({
         </div>
 
         {/* Sync hint banner */}
-        <div className="flex shrink-0 items-center justify-center gap-1.5 bg-muted/50 px-4 py-1.5">
+        <div className="flex items-center justify-center gap-1.5 bg-muted/50 px-4 py-1.5">
           <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className="text-muted-foreground">
             <path d="M1.5 6A4.5 4.5 0 0 1 9.17 3M10.5 6A4.5 4.5 0 0 1 2.83 9" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
             <path d="M8 1.5L9.17 3 7.5 3.8M4 10.5L2.83 9l1.67-.8" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
@@ -235,20 +235,20 @@ export function SessionDetailClient({
         </div>
 
         {/* Session info */}
-        <div className="shrink-0 px-5 pt-3 pb-2">
+        <div className="px-5 pt-3 pb-2">
           <h1 className="text-base font-bold leading-snug">{session.title}</h1>
           <p className="mt-0.5 text-xs text-muted-foreground">{session.date}</p>
         </div>
 
         {/* Song timeline chips */}
         {sessionSongs.length > 0 && (
-          <div className="shrink-0 px-5 pb-3">
+          <div className="px-5 pb-3">
             <SongTimeline songs={sessionSongs} onSeek={handleSeek} currentTime={currentTime} />
           </div>
         )}
 
         {/* Tab switcher — full width, 50/50 */}
-        <div className="flex shrink-0 w-full border-b border-border/40">
+        <div className="flex w-full border-b border-border/40">
           <button
             onClick={() => setActiveTab("feedback")}
             className={`relative flex-1 py-3 text-center text-sm font-medium transition-colors ${
@@ -275,8 +275,8 @@ export function SessionDetailClient({
           </button>
         </div>
 
-        {/* Scrollable tab content */}
-        <ScrollArea className="flex-1">
+        {/* Tab content */}
+        <div className="flex-1">
           {/* Part filter — horizontal scroll (feedback tab only) */}
           {activeTab === "feedback" && (
             <div className="px-5 py-3">
@@ -330,7 +330,7 @@ export function SessionDetailClient({
               <PraiseList praises={praises} onSeek={handleSeek} onDelete={handlePraiseDeleteRequest} currentUserName={currentUserName} highlightedId={highlightedId} />
             )}
           </div>
-        </ScrollArea>
+        </div>
       </div>
 
       {/* Fixed bottom comment input */}
