@@ -6,6 +6,13 @@ const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
   : "http://localhost:3000";
 
+export const viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+};
+
 export const metadata = {
   metadataBase: new URL(defaultUrl),
   title: "Harmony Band — 찬양팀 리뷰 플랫폼",
@@ -32,6 +39,9 @@ export default function RootLayout({
   return (
     <html lang="ko">
       <head>
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="format-detection" content="telephone=no" />
         <link
           rel="stylesheet"
           as="style"
