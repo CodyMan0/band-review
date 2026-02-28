@@ -55,6 +55,13 @@ module.exports = {
         md: "calc(var(--radius) - 2px)",
         sm: "calc(var(--radius) - 4px)",
       },
+      keyframes: {
+        flash: {
+          '0%': { opacity: '0', transform: 'scale(0.95)' },
+          '20%': { opacity: '0.5', transform: 'scale(1)' },
+          '100%': { opacity: '0', transform: 'scale(1.02)' },
+        },
+      },
     },
   },
 };

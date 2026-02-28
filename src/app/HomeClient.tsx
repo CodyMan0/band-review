@@ -202,9 +202,9 @@ export function HomeClient() {
 
       <div className="mx-5 mb-4 mt-6 shrink-0 h-px bg-border" />
 
-      <div className="flex min-h-0 flex-1 flex-col px-5 pb-24">
+      <div className="flex min-h-0 flex-1 flex-col pb-24">
         {/* Tab switcher */}
-        <div className="mb-3 flex w-full border-b border-border/40">
+        <div className="mb-3 flex w-full border-b border-border/40 px-5">
           <button
             onClick={() => setActiveTab('sessions')}
             className={`relative flex-1 py-2.5 text-center text-sm font-medium transition-colors ${
@@ -231,56 +231,58 @@ export function HomeClient() {
 
         {/* Tab content with ScrollArea + crossfade */}
         <ScrollArea className="flex-1">
-          <AnimatePresence mode="wait" initial={false}>
-            {activeTab === 'sessions' ? (
-              <motion.div
-                key="sessions-content"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.15 }}
-                className="pb-2"
-              >
-                {sessions.length === 0 ? (
-                  <EmptyState />
-                ) : (
-                  <div className="flex flex-col gap-2">
-                    {sessions.map((session) => (
-                      <SessionCard key={session.id} session={session} onDelete={handleDeleteRequest} />
-                    ))}
-                  </div>
-                )}
-              </motion.div>
-            ) : (
-              <motion.div
-                key="songs-content"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.15 }}
-                className="pb-2"
-              >
-                <Input
-                  placeholder="곡 검색..."
-                  value={songSearch}
-                  onChange={(e) => setSongSearch(e.target.value)}
-                  className="mb-3 h-10 rounded-xl text-sm"
-                />
-                {filteredSongs.length === 0 ? (
-                  <div className="flex flex-col items-center py-12">
-                    <CarrotEmpty size={56} className="mb-3 opacity-80" />
-                    <p className="text-sm font-medium text-muted-foreground">아직 등록된 곡이 없어요</p>
-                  </div>
-                ) : (
-                  <div className="flex flex-col gap-2">
-                    {filteredSongs.map((song) => (
-                      <SongCard key={song.id} song={song} onDelete={handleSongDeleteRequest} />
-                    ))}
-                  </div>
-                )}
-              </motion.div>
-            )}
-          </AnimatePresence>
+          <div className="px-4 pt-1">
+            <AnimatePresence mode="wait" initial={false}>
+              {activeTab === 'sessions' ? (
+                <motion.div
+                  key="sessions-content"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.15 }}
+                  className="pb-2"
+                >
+                  {sessions.length === 0 ? (
+                    <EmptyState />
+                  ) : (
+                    <div className="flex flex-col gap-2">
+                      {sessions.map((session) => (
+                        <SessionCard key={session.id} session={session} onDelete={handleDeleteRequest} />
+                      ))}
+                    </div>
+                  )}
+                </motion.div>
+              ) : (
+                <motion.div
+                  key="songs-content"
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  exit={{ opacity: 0 }}
+                  transition={{ duration: 0.15 }}
+                  className="pb-2"
+                >
+                  <Input
+                    placeholder="곡 검색..."
+                    value={songSearch}
+                    onChange={(e) => setSongSearch(e.target.value)}
+                    className="mb-3 h-10 rounded-xl text-sm"
+                  />
+                  {filteredSongs.length === 0 ? (
+                    <div className="flex flex-col items-center py-12">
+                      <CarrotEmpty size={56} className="mb-3 opacity-80" />
+                      <p className="text-sm font-medium text-muted-foreground">아직 등록된 곡이 없어요</p>
+                    </div>
+                  ) : (
+                    <div className="flex flex-col gap-2">
+                      {filteredSongs.map((song) => (
+                        <SongCard key={song.id} song={song} onDelete={handleSongDeleteRequest} />
+                      ))}
+                    </div>
+                  )}
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
         </ScrollArea>
       </div>
 

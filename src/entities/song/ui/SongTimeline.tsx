@@ -28,10 +28,10 @@ export function SongTimeline({ songs, onSeek, currentTime }: SongTimelineProps) 
         <button
           key={song.id}
           onClick={() => onSeek(song.start_time_sec)}
-          className={`rounded-full px-2.5 py-1 text-[11px] font-medium transition-colors active:scale-95 ${
+          className={`cursor-pointer rounded-full px-2.5 py-1 text-[11px] font-medium transition-all active:scale-95 ${
             isActive(index)
               ? 'bg-primary text-primary-foreground shadow-sm'
-              : 'bg-muted text-muted-foreground'
+              : 'bg-muted text-muted-foreground hover:bg-muted-foreground/15'
           }`}
         >
           {song.song_name}

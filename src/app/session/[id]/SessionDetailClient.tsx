@@ -48,6 +48,7 @@ export function SessionDetailClient({
   const [activeTab, setActiveTab] = useState<"feedback" | "praise">("feedback");
   const [isPraiseMode, setIsPraiseMode] = useState(false);
   const [highlightedId, setHighlightedId] = useState<string | null>(null);
+  const [videoFlash, setVideoFlash] = useState(false);
   const [currentUserName, setCurrentUserName] = useState('');
   const [comments, setComments] = useState(initialComments);
   const [deleteCommentTarget, setDeleteCommentTarget] = useState<CommentWithReplies | null>(null);
@@ -111,6 +112,8 @@ export function SessionDetailClient({
 
   const handleSeek = useCallback((seconds: number) => {
     playerRef.current?.seekTo(seconds);
+    setVideoFlash(true);
+    setTimeout(() => setVideoFlash(false), 800);
   }, []);
 
   const handleMarkerClick = useCallback(
@@ -198,13 +201,16 @@ export function SessionDetailClient({
         </div>
 
         {/* Video — edge to edge, no border */}
-        <div className="shrink-0">
+        <div className="relative shrink-0">
           <VideoPlayer
             ref={playerRef}
             videoUrl={session.video_url}
             videoType={session.video_type}
             onTimeUpdate={handleTimeUpdate}
           />
+          {videoFlash && (
+            <div className="pointer-events-none absolute inset-0 animate-[flash_0.8s_cubic-bezier(0.25,0.46,0.45,0.94)] bg-white/25 backdrop-blur-[2px]" />
+          )}
         </div>
 
         {/* Timeline markers */}
