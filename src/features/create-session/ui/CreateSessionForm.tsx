@@ -1,11 +1,13 @@
 'use client';
 
-import { useCallback, useState, useTransition } from 'react';
+import { useCallback, useRef, useState, useTransition } from 'react';
 import { useFieldArray, useForm, useWatch } from 'react-hook-form';
 
 import { createSession } from '@/features/create-session/action/create-session';
 import { SongListInput } from '@/features/create-session-songs/ui/SongListInput';
 import { getProfile } from '@/shared/config/profile';
+import { convertToAac, needsConversion } from '@/shared/lib/convert-audio';
+import { uploadAudio, saveAudioUrl } from '@/shared/lib/upload-audio';
 import { Button, Input } from '@/shared/ui';
 
 interface SongField {
@@ -32,6 +34,10 @@ export function CreateSessionForm() {
   const profile = getProfile();
   const [error, setError] = useState('');
   const [isPending, startTransition] = useTransition();
+  const [audioFile, setAudioFile] = useState<File | null>(null);
+  const [audioProgress, setAudioProgress] = useState<number | null>(null);
+  const [audioStatus, setAudioStatus] = useState('');
+  const audioInputRef = useRef<HTMLInputElement>(null);
 
   const { register, control, handleSubmit } = useForm<FormValues>({
     defaultValues: {
@@ -58,6 +64,13 @@ export function CreateSessionForm() {
 
   const isFormReady = !!watchTitle?.trim() && !!watchUrl?.trim() && hasValidSong && !hasPartialRow;
 
+  const handleAudioFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] ?? null;
+    setAudioFile(file);
+    setAudioProgress(null);
+    setAudioStatus(file ? `${file.name} 선택됨` : '');
+  }, []);
+
   const onSubmit = handleSubmit((data) => {
     setError('');
     const formData = new FormData();
@@ -67,6 +80,8 @@ export function CreateSessionForm() {
     formData.set('video_type', 'youtube');
     formData.set('church_id', profile?.churchId ?? '');
     formData.set('created_by', profile?.name ?? '');
+    // Flag to return session ID instead of redirect when audio needs uploading
+    if (audioFile) formData.set('return_id', 'true');
     formData.set('songs_json', JSON.stringify(
       data.songs
         .filter((s) => s.name.trim() && s.startTime.trim())
@@ -77,8 +92,33 @@ export function CreateSessionForm() {
       const result = await createSession({}, formData);
       if (result.error) {
         setError(result.error);
+        return;
       }
-      // On success, createSession calls redirect() — form state preserved until navigation
+
+      // If audio file exists and session was created, upload audio
+      if (audioFile && result.sessionId) {
+        try {
+          let audioBlob: Blob;
+          if (needsConversion(audioFile)) {
+            setAudioStatus('오디오 변환 중...');
+            setAudioProgress(0);
+            audioBlob = await convertToAac(audioFile, (ratio) => setAudioProgress(ratio));
+          } else {
+            audioBlob = audioFile;
+          }
+
+          setAudioStatus('업로드 중...');
+          setAudioProgress(null);
+          const audioUrl = await uploadAudio(result.sessionId, audioBlob);
+          await saveAudioUrl(result.sessionId, audioUrl);
+
+          // Navigate after upload complete
+          window.location.href = `/session/${result.sessionId}`;
+        } catch {
+          setError('오디오 업로드에 실패했습니다. 세션은 생성되었습니다.');
+        }
+      }
+      // If no audio, createSession already called redirect()
     });
   });
 
@@ -115,6 +155,43 @@ export function CreateSessionForm() {
           placeholder="https://youtube.com/watch?v=..."
           className="h-11 rounded-xl font-mono text-sm"
         />
+      </div>
+
+      {/* Audio file (optional) */}
+      <div className="flex flex-col gap-1.5">
+        <label htmlFor="audio_file" className="text-sm font-medium">오디오 파일 <span className="text-xs font-normal text-muted-foreground">(선택)</span></label>
+        <p className="text-xs text-muted-foreground">악기별 EQ로 들으려면 오디오 파일을 첨부하세요</p>
+        <input
+          ref={audioInputRef}
+          id="audio_file"
+          type="file"
+          accept=".wav,.mp3,.aac,.m4a,.mp4"
+          onChange={handleAudioFileChange}
+          className="hidden"
+        />
+        <button
+          type="button"
+          onClick={() => audioInputRef.current?.click()}
+          className="flex h-11 items-center justify-center gap-2 rounded-xl border border-dashed border-border bg-muted/30 text-sm text-muted-foreground transition-colors hover:bg-muted/50 active:scale-[0.98]"
+        >
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+            <path d="M8 3v10M3 8h10" />
+          </svg>
+          {audioFile ? audioFile.name : '오디오 파일 선택'}
+        </button>
+        {audioStatus && (
+          <div className="flex items-center gap-2">
+            <p className="text-xs text-muted-foreground">{audioStatus}</p>
+            {audioProgress !== null && (
+              <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-border">
+                <div
+                  className="h-full rounded-full bg-foreground transition-all"
+                  style={{ width: `${Math.round(audioProgress * 100)}%` }}
+                />
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Songs */}

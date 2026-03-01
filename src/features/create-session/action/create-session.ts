@@ -7,6 +7,7 @@ import { createClient } from '@/shared/utils/supabase/server';
 
 interface CreateSessionState {
   error?: string;
+  sessionId?: string;
 }
 
 function isValidYoutubeUrl(url: string): boolean {
@@ -61,6 +62,12 @@ export async function createSession(
     } catch {
       // Ignore malformed songs_json - session was created successfully
     }
+  }
+
+  // When audio upload is needed, return sessionId instead of redirect
+  const returnId = formData.get('return_id') as string | null;
+  if (returnId) {
+    return { sessionId: data.id };
   }
 
   redirect(`/session/${data.id}`);

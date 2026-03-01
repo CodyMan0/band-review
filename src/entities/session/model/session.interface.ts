@@ -4,6 +4,7 @@ export interface Session {
   date: string;
   video_url: string;
   video_type: 'youtube' | 'upload';
+  audio_url?: string | null;
   created_at: string;
   created_by?: string;
 }

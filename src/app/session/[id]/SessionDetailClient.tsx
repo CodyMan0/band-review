@@ -14,6 +14,12 @@ import {
   VideoPlayer,
   type VideoPlayerRef,
 } from "@/entities/session/ui/VideoPlayer";
+import {
+  AudioPlayer,
+  type AudioPlayerRef,
+} from "@/entities/session/ui/AudioPlayer";
+import { EQPresetBar } from "@/features/audio-eq";
+import { useAudioEQ } from "@/shared/lib/audio-eq";
 import { CommentForm } from "@/features/create-comment/ui/CommentForm";
 import { PraiseForm } from "@/features/create-praise/ui/PraiseForm";
 import { deleteComment } from "@/features/delete-comment/action/delete-comment";
@@ -41,6 +47,9 @@ export function SessionDetailClient({
 }: Props) {
   const searchParams = useSearchParams();
   const playerRef = useRef<VideoPlayerRef>(null);
+  const audioPlayerRef = useRef<AudioPlayerRef>(null);
+  const [audioElement, setAudioElement] = useState<HTMLAudioElement | null>(null);
+  const { activePresetId, setPreset } = useAudioEQ(audioElement);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(0);
   const [filterPart, setFilterPart] = useState<Part | "all">("all");
@@ -94,6 +103,17 @@ export function SessionDetailClient({
     setPraises((prev) => prev.filter((p) => p.id !== deletePraiseTarget.id));
     setDeletePraiseTarget(null);
   };
+
+  // Connect audio element to EQ hook after AudioPlayer mounts
+  useEffect(() => {
+    if (!session.audio_url) return;
+    // Small delay to ensure AudioPlayer has rendered and ref is set
+    const timer = setTimeout(() => {
+      const el = audioPlayerRef.current?.getAudioElement() ?? null;
+      if (el) setAudioElement(el);
+    }, 100);
+    return () => clearTimeout(timer);
+  }, [session.audio_url]);
 
   useEffect(() => {
     const t = searchParams.get('t');
@@ -233,6 +253,20 @@ export function SessionDetailClient({
           </svg>
           <span className="text-[11px] text-muted-foreground">시간이 안 맞나요? 새로고침해보세요</span>
         </div>
+
+        {/* Audio Player + EQ (when audio_url exists) */}
+        {session.audio_url && (
+          <div className="flex flex-col gap-2 px-5 pt-3">
+            <AudioPlayer
+              ref={audioPlayerRef}
+              audioUrl={session.audio_url}
+            />
+            <EQPresetBar
+              activePresetId={activePresetId}
+              onPresetChange={setPreset}
+            />
+          </div>
+        )}
 
         {/* Session info */}
         <div className="px-5 pt-3 pb-2">
