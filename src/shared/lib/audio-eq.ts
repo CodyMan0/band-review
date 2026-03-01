@@ -19,9 +19,13 @@ export const EQ_PRESETS: EQPreset[] = [
     label: '기타',
     emoji: '🎸',
     filters: [
-      { frequency: 300, gain: 4, type: 'peaking', Q: 1 },
-      { frequency: 1000, gain: 6, type: 'peaking', Q: 0.8 },
-      { frequency: 3000, gain: 4, type: 'peaking', Q: 1 },
+      // 기타 대역 강하게 부스트
+      { frequency: 400, gain: 8, type: 'peaking', Q: 0.8 },
+      { frequency: 1000, gain: 10, type: 'peaking', Q: 0.7 },
+      { frequency: 3000, gain: 8, type: 'peaking', Q: 0.8 },
+      // 다른 대역 컷
+      { frequency: 80, gain: -6, type: 'peaking', Q: 0.8 },
+      { frequency: 8000, gain: -4, type: 'peaking', Q: 1 },
     ],
   },
   {
@@ -29,9 +33,14 @@ export const EQ_PRESETS: EQPreset[] = [
     label: '드럼',
     emoji: '🥁',
     filters: [
-      { frequency: 60, gain: 5, type: 'peaking', Q: 0.8 },
-      { frequency: 150, gain: 4, type: 'peaking', Q: 1 },
-      { frequency: 7000, gain: 5, type: 'peaking', Q: 1.2 },
+      // 킥/스네어 저역 부스트
+      { frequency: 60, gain: 10, type: 'peaking', Q: 0.7 },
+      { frequency: 200, gain: 6, type: 'peaking', Q: 0.8 },
+      // 하이햇/심벌 고역 부스트
+      { frequency: 5000, gain: 8, type: 'peaking', Q: 0.8 },
+      { frequency: 10000, gain: 6, type: 'peaking', Q: 1 },
+      // 중역 컷 (기타/건반/보컬 줄이기)
+      { frequency: 1000, gain: -5, type: 'peaking', Q: 0.6 },
     ],
   },
   {
@@ -39,9 +48,13 @@ export const EQ_PRESETS: EQPreset[] = [
     label: '건반',
     emoji: '🎹',
     filters: [
-      { frequency: 500, gain: 4, type: 'peaking', Q: 1 },
-      { frequency: 1200, gain: 6, type: 'peaking', Q: 0.8 },
-      { frequency: 2000, gain: 4, type: 'peaking', Q: 1 },
+      // 건반 중역 부스트
+      { frequency: 500, gain: 8, type: 'peaking', Q: 0.8 },
+      { frequency: 1200, gain: 10, type: 'peaking', Q: 0.7 },
+      { frequency: 2500, gain: 7, type: 'peaking', Q: 0.8 },
+      // 저역/고역 컷
+      { frequency: 80, gain: -6, type: 'peaking', Q: 0.8 },
+      { frequency: 8000, gain: -4, type: 'peaking', Q: 1 },
     ],
   },
   {
@@ -49,9 +62,13 @@ export const EQ_PRESETS: EQPreset[] = [
     label: '베이스',
     emoji: '🎸',
     filters: [
-      { frequency: 80, gain: 6, type: 'peaking', Q: 0.8 },
-      { frequency: 150, gain: 5, type: 'peaking', Q: 1 },
-      { frequency: 200, gain: 3, type: 'peaking', Q: 1.2 },
+      // 베이스 저역 강하게 부스트
+      { frequency: 60, gain: 10, type: 'peaking', Q: 0.7 },
+      { frequency: 120, gain: 10, type: 'peaking', Q: 0.7 },
+      { frequency: 250, gain: 6, type: 'peaking', Q: 0.8 },
+      // 중고역 컷
+      { frequency: 1000, gain: -5, type: 'peaking', Q: 0.6 },
+      { frequency: 5000, gain: -8, type: 'peaking', Q: 0.8 },
     ],
   },
   {
@@ -59,9 +76,13 @@ export const EQ_PRESETS: EQPreset[] = [
     label: '보컬',
     emoji: '🎤',
     filters: [
-      { frequency: 2000, gain: 4, type: 'peaking', Q: 1 },
-      { frequency: 2800, gain: 6, type: 'peaking', Q: 0.8 },
-      { frequency: 3500, gain: 4, type: 'peaking', Q: 1 },
+      // 보컬 존재감 대역 부스트
+      { frequency: 2000, gain: 8, type: 'peaking', Q: 0.8 },
+      { frequency: 3000, gain: 10, type: 'peaking', Q: 0.7 },
+      { frequency: 4000, gain: 6, type: 'peaking', Q: 0.8 },
+      // 저역 컷 (베이스/킥 줄이기)
+      { frequency: 100, gain: -8, type: 'peaking', Q: 0.7 },
+      { frequency: 8000, gain: -4, type: 'peaking', Q: 1 },
     ],
   },
 ];

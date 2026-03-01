@@ -15,7 +15,6 @@ interface SongField {
 interface FormValues {
   title: string;
   date: string;
-  video_url: string;
   songs: SongField[];
 }
 

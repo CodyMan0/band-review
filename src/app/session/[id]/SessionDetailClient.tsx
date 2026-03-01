@@ -131,10 +131,16 @@ export function SessionDetailClient({
   }, []);
 
   const handleSeek = useCallback((seconds: number) => {
-    playerRef.current?.seekTo(seconds);
-    setVideoFlash(true);
-    setTimeout(() => setVideoFlash(false), 800);
-  }, []);
+    if (session.video_url) {
+      playerRef.current?.seekTo(seconds);
+      setVideoFlash(true);
+      setTimeout(() => setVideoFlash(false), 800);
+    } else {
+      // Audio-only session: seek the audio element directly
+      const audio = audioPlayerRef.current?.getAudioElement();
+      if (audio) audio.currentTime = seconds;
+    }
+  }, [session.video_url]);
 
   const handleMarkerClick = useCallback(
     (id: string, type: "comment" | "praise") => {
@@ -165,6 +171,14 @@ export function SessionDetailClient({
     const dur = playerRef.current?.getDuration() ?? 0;
     if (dur > 0) setDuration(dur);
   }, []);
+
+  const handleAudioTimeUpdate = useCallback((time: number, dur: number) => {
+    // Only drive timeline from audio when there's no video
+    if (!session.video_url) {
+      setCurrentTime(time);
+      if (dur > 0) setDuration(dur);
+    }
+  }, [session.video_url]);
 
   const handleReply = useCallback((commentId: string) => {
     setReplyTo(commentId);
@@ -220,20 +234,48 @@ export function SessionDetailClient({
           </Link>
         </div>
 
-        {/* Video — edge to edge, no border */}
-        <div className="relative">
-          <VideoPlayer
-            ref={playerRef}
-            videoUrl={session.video_url}
-            videoType={session.video_type}
-            onTimeUpdate={handleTimeUpdate}
-          />
-          {videoFlash && (
-            <div className="pointer-events-none absolute inset-0 animate-[flash_0.8s_cubic-bezier(0.25,0.46,0.45,0.94)] bg-white/25 backdrop-blur-[2px]" />
-          )}
-        </div>
+        {/* Video — only when video_url exists */}
+        {session.video_url && (
+          <>
+            <div className="relative">
+              <VideoPlayer
+                ref={playerRef}
+                videoUrl={session.video_url}
+                videoType={session.video_type}
+                onTimeUpdate={handleTimeUpdate}
+              />
+              {videoFlash && (
+                <div className="pointer-events-none absolute inset-0 animate-[flash_0.8s_cubic-bezier(0.25,0.46,0.45,0.94)] bg-white/25 backdrop-blur-[2px]" />
+              )}
+            </div>
 
-        {/* Timeline markers */}
+            {/* Sync hint banner */}
+            <div className="flex items-center justify-center gap-1.5 bg-muted/50 px-4 py-1.5">
+              <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className="text-muted-foreground">
+                <path d="M1.5 6A4.5 4.5 0 0 1 9.17 3M10.5 6A4.5 4.5 0 0 1 2.83 9" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
+                <path d="M8 1.5L9.17 3 7.5 3.8M4 10.5L2.83 9l1.67-.8" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+              <span className="text-[11px] text-muted-foreground">시간이 안 맞나요? 새로고침해보세요</span>
+            </div>
+          </>
+        )}
+
+        {/* Audio Player + EQ (when audio_url exists) */}
+        {session.audio_url && (
+          <div className="flex flex-col gap-2 px-5 pt-3">
+            <AudioPlayer
+              ref={audioPlayerRef}
+              audioUrl={session.audio_url}
+              onTimeUpdate={handleAudioTimeUpdate}
+            />
+            <EQPresetBar
+              activePresetId={activePresetId}
+              onPresetChange={setPreset}
+            />
+          </div>
+        )}
+
+        {/* Timeline markers — show for both video and audio sessions */}
         <div>
           <TimelineMarkers
             comments={comments}
@@ -244,29 +286,6 @@ export function SessionDetailClient({
             onMarkerClick={handleMarkerClick}
           />
         </div>
-
-        {/* Sync hint banner */}
-        <div className="flex items-center justify-center gap-1.5 bg-muted/50 px-4 py-1.5">
-          <svg width="12" height="12" viewBox="0 0 12 12" fill="none" className="text-muted-foreground">
-            <path d="M1.5 6A4.5 4.5 0 0 1 9.17 3M10.5 6A4.5 4.5 0 0 1 2.83 9" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round"/>
-            <path d="M8 1.5L9.17 3 7.5 3.8M4 10.5L2.83 9l1.67-.8" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-          <span className="text-[11px] text-muted-foreground">시간이 안 맞나요? 새로고침해보세요</span>
-        </div>
-
-        {/* Audio Player + EQ (when audio_url exists) */}
-        {session.audio_url && (
-          <div className="flex flex-col gap-2 px-5 pt-3">
-            <AudioPlayer
-              ref={audioPlayerRef}
-              audioUrl={session.audio_url}
-            />
-            <EQPresetBar
-              activePresetId={activePresetId}
-              onPresetChange={setPreset}
-            />
-          </div>
-        )}
 
         {/* Session info */}
         <div className="px-5 pt-3 pb-2">

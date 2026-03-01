@@ -1,14 +1,14 @@
-'use client';
+"use client";
 
-import { useCallback, useRef, useState, useTransition } from 'react';
-import { useFieldArray, useForm, useWatch } from 'react-hook-form';
+import { useCallback, useRef, useState, useTransition } from "react";
+import { useFieldArray, useForm, useWatch } from "react-hook-form";
 
-import { createSession } from '@/features/create-session/action/create-session';
-import { SongListInput } from '@/features/create-session-songs/ui/SongListInput';
-import { getProfile } from '@/shared/config/profile';
-import { convertToAac, needsConversion } from '@/shared/lib/convert-audio';
-import { uploadAudio, saveAudioUrl } from '@/shared/lib/upload-audio';
-import { Button, Input } from '@/shared/ui';
+import { SongListInput } from "@/features/create-session-songs/ui/SongListInput";
+import { createSession } from "@/features/create-session/action/create-session";
+import { getProfile } from "@/shared/config/profile";
+import { convertToAac, needsConversion } from "@/shared/lib/convert-audio";
+import { saveAudioUrl, uploadAudio } from "@/shared/lib/upload-audio";
+import { Button, Input } from "@/shared/ui";
 
 interface SongField {
   name: string;
@@ -18,75 +18,84 @@ interface SongField {
 interface FormValues {
   title: string;
   date: string;
-  video_url: string;
   songs: SongField[];
 }
 
-const DEFAULT_SONGS: SongField[] = Array.from({ length: 6 }, () => ({ name: '', startTime: '' }));
+const DEFAULT_SONGS: SongField[] = Array.from({ length: 6 }, () => ({
+  name: "",
+  startTime: "",
+}));
 
 function parseTimeToSeconds(time: string): number {
-  const parts = time.split(':');
+  const parts = time.split(":");
   if (parts.length !== 2) return 0;
   return (parseInt(parts[0], 10) || 0) * 60 + (parseInt(parts[1], 10) || 0);
 }
 
 export function CreateSessionForm() {
   const profile = getProfile();
-  const [error, setError] = useState('');
+  const [error, setError] = useState("");
   const [isPending, startTransition] = useTransition();
   const [audioFile, setAudioFile] = useState<File | null>(null);
   const [audioProgress, setAudioProgress] = useState<number | null>(null);
-  const [audioStatus, setAudioStatus] = useState('');
+  const [audioStatus, setAudioStatus] = useState("");
   const audioInputRef = useRef<HTMLInputElement>(null);
 
   const { register, control, handleSubmit } = useForm<FormValues>({
     defaultValues: {
-      title: '',
-      date: new Date().toISOString().split('T')[0],
-      video_url: '',
+      title: "",
+      date: new Date().toISOString().split("T")[0],
       songs: DEFAULT_SONGS,
     },
-    mode: 'onChange',
+    mode: "onChange",
   });
 
-  const fieldArray = useFieldArray({ control, name: 'songs' });
+  const fieldArray = useFieldArray({ control, name: "songs" });
 
-  const watchTitle = useWatch({ control, name: 'title' });
-  const watchUrl = useWatch({ control, name: 'video_url' });
-  const watchSongs = useWatch({ control, name: 'songs' });
+  const watchTitle = useWatch({ control, name: "title" });
+  const watchSongs = useWatch({ control, name: "songs" });
 
-  const hasValidSong = watchSongs.some((s) => s.name.trim() && s.startTime.trim());
+  const hasValidSong = watchSongs.some(
+    (s) => s.name.trim() && s.startTime.trim(),
+  );
   const hasPartialRow = watchSongs.some((s) => {
     const hasName = !!s.name.trim();
     const hasTime = !!s.startTime.trim();
     return (hasName && !hasTime) || (!hasName && hasTime);
   });
 
-  const isFormReady = !!watchTitle?.trim() && !!watchUrl?.trim() && hasValidSong && !hasPartialRow;
+  const isFormReady = !!watchTitle?.trim() && hasValidSong && !hasPartialRow;
 
-  const handleAudioFileChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0] ?? null;
-    setAudioFile(file);
-    setAudioProgress(null);
-    setAudioStatus(file ? `${file.name} 선택됨` : '');
-  }, []);
+  const handleAudioFileChange = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0] ?? null;
+      setAudioFile(file);
+      setAudioProgress(null);
+      setAudioStatus(file ? `${file.name} 선택됨` : "");
+    },
+    [],
+  );
 
   const onSubmit = handleSubmit((data) => {
-    setError('');
+    setError("");
     const formData = new FormData();
-    formData.set('title', data.title);
-    formData.set('date', data.date);
-    formData.set('video_url', data.video_url);
-    formData.set('video_type', 'youtube');
-    formData.set('church_id', profile?.churchId ?? '');
-    formData.set('created_by', profile?.name ?? '');
+    formData.set("title", data.title);
+    formData.set("date", data.date);
+    formData.set("church_id", profile?.churchId ?? "");
+    formData.set("created_by", profile?.name ?? "");
     // Flag to return session ID instead of redirect when audio needs uploading
-    if (audioFile) formData.set('return_id', 'true');
-    formData.set('songs_json', JSON.stringify(
-      data.songs
-        .filter((s) => s.name.trim() && s.startTime.trim())
-        .map((s) => ({ name: s.name.trim(), startTimeSec: parseTimeToSeconds(s.startTime) }))
-    ));
+    if (audioFile) formData.set("return_id", "true");
+    formData.set(
+      "songs_json",
+      JSON.stringify(
+        data.songs
+          .filter((s) => s.name.trim() && s.startTime.trim())
+          .map((s) => ({
+            name: s.name.trim(),
+            startTimeSec: parseTimeToSeconds(s.startTime),
+          })),
+      ),
+    );
 
     startTransition(async () => {
       const result = await createSession({}, formData);
@@ -100,22 +109,27 @@ export function CreateSessionForm() {
         try {
           let audioBlob: Blob;
           if (needsConversion(audioFile)) {
-            setAudioStatus('오디오 변환 중...');
+            setAudioStatus("경량화된 오디오 변환 중...");
             setAudioProgress(0);
-            audioBlob = await convertToAac(audioFile, (ratio) => setAudioProgress(ratio));
+            audioBlob = await convertToAac(audioFile, (ratio) =>
+              setAudioProgress(ratio),
+            );
           } else {
             audioBlob = audioFile;
           }
 
-          setAudioStatus('업로드 중...');
+          setAudioStatus("업로드 중...");
           setAudioProgress(null);
           const audioUrl = await uploadAudio(result.sessionId, audioBlob);
           await saveAudioUrl(result.sessionId, audioUrl);
 
           // Navigate after upload complete
           window.location.href = `/session/${result.sessionId}`;
-        } catch {
-          setError('오디오 업로드에 실패했습니다. 세션은 생성되었습니다.');
+        } catch (e) {
+          console.error("Audio upload error:", e);
+          setError(
+            `오디오 업로드에 실패했습니다: ${e instanceof Error ? e.message : String(e)}`,
+          );
         }
       }
       // If no audio, createSession already called redirect()
@@ -126,10 +140,12 @@ export function CreateSessionForm() {
     <form onSubmit={onSubmit} className="flex flex-col gap-6">
       {/* Title */}
       <div className="flex flex-col gap-1.5">
-        <label htmlFor="title" className="text-sm font-medium">예배 이름</label>
+        <label htmlFor="title" className="text-sm font-medium">
+          예배 이름
+        </label>
         <Input
           id="title"
-          {...register('title', { required: true })}
+          {...register("title", { required: true })}
           placeholder="예: 2월 3주차 주일예배"
           className="h-11 rounded-xl text-sm"
         />
@@ -137,30 +153,25 @@ export function CreateSessionForm() {
 
       {/* Date */}
       <div className="flex flex-col gap-1.5">
-        <label htmlFor="date" className="text-sm font-medium">예배 날짜</label>
+        <label htmlFor="date" className="text-sm font-medium">
+          예배 날짜
+        </label>
         <Input
           id="date"
-          {...register('date', { required: true })}
+          {...register("date", { required: true })}
           type="date"
           className="h-11 rounded-xl text-sm"
         />
       </div>
 
-      {/* YouTube URL */}
+      {/* Audio file */}
       <div className="flex flex-col gap-1.5">
-        <YouTubeLabelWithHelp />
-        <Input
-          id="video_url"
-          {...register('video_url', { required: true })}
-          placeholder="https://youtube.com/watch?v=..."
-          className="h-11 rounded-xl font-mono text-sm"
-        />
-      </div>
-
-      {/* Audio file (optional) */}
-      <div className="flex flex-col gap-1.5">
-        <label htmlFor="audio_file" className="text-sm font-medium">오디오 파일 <span className="text-xs font-normal text-muted-foreground">(선택)</span></label>
-        <p className="text-xs text-muted-foreground">악기별 EQ로 들으려면 오디오 파일을 첨부하세요</p>
+        <label htmlFor="audio_file" className="text-sm font-medium">
+          오디오 파일
+        </label>
+        <p className="text-xs text-muted-foreground">
+          악기별 EQ로 들으려면 오디오 파일을 첨부하세요
+        </p>
         <input
           ref={audioInputRef}
           id="audio_file"
@@ -174,10 +185,18 @@ export function CreateSessionForm() {
           onClick={() => audioInputRef.current?.click()}
           className="flex h-11 items-center justify-center gap-2 rounded-xl border border-dashed border-border bg-muted/30 text-sm text-muted-foreground transition-colors hover:bg-muted/50 active:scale-[0.98]"
         >
-          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round">
+          <svg
+            width="16"
+            height="16"
+            viewBox="0 0 16 16"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+          >
             <path d="M8 3v10M3 8h10" />
           </svg>
-          {audioFile ? audioFile.name : '오디오 파일 선택'}
+          {audioFile ? audioFile.name : "오디오 파일 선택"}
         </button>
         {audioStatus && (
           <div className="flex items-center gap-2">
@@ -197,8 +216,12 @@ export function CreateSessionForm() {
       {/* Songs */}
       <div className="flex flex-col gap-1.5">
         <label className="text-sm font-medium">곡 목록</label>
-        <p className="text-xs text-muted-foreground">곡명과 시작 시간을 입력해주세요</p>
-        <p className="info-banner">띄어쓰기는 자동 제거돼요 — 같은 곡이 다르게 분류되지 않아요</p>
+        <p className="text-xs text-muted-foreground">
+          곡명과 시작 시간을 입력해주세요
+        </p>
+        <p className="info-banner">
+          띄어쓰기는 자동 제거돼요 — 같은 곡이 다르게 분류되지 않아요
+        </p>
         <SongListInput
           control={control}
           register={register}
@@ -220,40 +243,8 @@ export function CreateSessionForm() {
         disabled={isPending || !isFormReady}
         className="h-12 w-full rounded-xl text-sm font-semibold active:scale-[0.98]"
       >
-        {isPending ? '만드는 중...' : '세션 만들기'}
+        {isPending ? "만드는 중..." : "세션 만들기"}
       </Button>
     </form>
-  );
-}
-
-function YouTubeLabelWithHelp() {
-  const [open, setOpen] = useState(false);
-  const toggle = useCallback(() => setOpen((v) => !v), []);
-
-  return (
-    <div>
-      <div className="flex items-center gap-1.5">
-        <label htmlFor="video_url" className="text-sm font-medium">YouTube 링크</label>
-        <button
-          type="button"
-          onClick={toggle}
-          className="flex h-[18px] w-[18px] items-center justify-center rounded-full bg-muted text-muted-foreground transition-colors hover:bg-muted-foreground/20"
-          aria-label="도움말"
-        >
-          <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-            <path d="M4.5 4.5C4.5 3.67 5.17 3 6 3C6.83 3 7.5 3.67 7.5 4.5C7.5 5.17 7.03 5.5 6.5 5.75C6.22 5.89 6 6.1 6 6.4V6.75" stroke="currentColor" strokeWidth="1.2" strokeLinecap="round" />
-            <circle cx="6" cy="8.5" r="0.6" fill="currentColor" />
-          </svg>
-        </button>
-      </div>
-      {open && (
-        <div className="mt-1.5 rounded-lg bg-muted/70 px-3 py-2.5 text-xs leading-relaxed text-muted-foreground">
-          본당 예배 영상을 YouTube에 <strong className="text-foreground/80">일부 공개(Unlisted)</strong>로 업로드한 뒤 링크를 붙여넣어 주세요. 서버 용량 문제로 직접 업로드 대신 YouTube를 활용하고 있어요.
-        </div>
-      )}
-      {!open && (
-        <p className="mt-0.5 text-xs text-muted-foreground">일부 공개(Unlisted) 영상도 사용 가능해요</p>
-      )}
-    </div>
   );
 }
